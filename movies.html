@@ -26,8 +26,11 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         padding: 40px 20px;
         text-align: center;
+        height: 100%;
+        width: 100%;
       }
 
       h1 {
@@ -86,6 +89,7 @@
         padding: 10px 20px;
         border-radius: 12px;
         font-size: 16px;
+        z-index: 9999;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
       }
 
@@ -93,17 +97,20 @@
         background-color: #dddddd;
       }
 
-      iframe {
-        border: none;
-        height: 100vh;
+      #serverWrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100vw;
+        height: 100vh;
         display: none;
+        z-index: 999;
       }
 
-      #server1,
-      #server2,
-      #server3,
-      #server4 {
+      iframe {
+        border: none;
+        height: 100%;
+        width: 100%;
         display: none;
       }
     </style>
@@ -123,45 +130,39 @@
       <button id="server1Button" onclick="openServer('server1')">Server 1</button>
       <button id="server3Button" onclick="openServer('server3')">Server 2</button>
       <button id="server4Button" onclick="openServer('server4')">Server 3</button>
+    </div>
 
-      <button id="backButton" onclick="goBack()">Back</button>
+    <button id="backButton" onclick="goBack()">Back</button>
 
+    <div id="serverWrapper">
       <iframe id="server1" src="https://code-andrewy.github.io/jumpman64beta/movieshost.html/"></iframe>
       <iframe id="server3" src="https://xprime.tv/"></iframe>
       <iframe id="server4" src="https://ww25.soap2day.day/"></iframe>
     </div>
 
     <script>
-      function openServer(server) {
-        document.getElementById("server1").style.display = "none";
-        document.getElementById("server2").style.display = "none";
-        document.getElementById("server3").style.display = "none";
-        document.getElementById("server4").style.display = "none";
-        document.querySelector("h1").style.display = "none";
-
-        document.getElementById(server).style.display = "block";
-
-        document.getElementById("server1Button").style.display = "none";
-        document.getElementById("server2Button").style.display = "none";
-        document.getElementById("server3Button").style.display = "none";
-        document.getElementById("server4Button").style.display = "none";
-        document.getElementById("instructions").style.display = "none";
+      function openServer(serverId) {
+        document.getElementById("container").style.display = "none";
+        document.getElementById("serverWrapper").style.display = "block";
         document.getElementById("backButton").style.display = "inline-block";
+
+        // Hide all iframes first
+        document.querySelectorAll("iframe").forEach((iframe) => {
+          iframe.style.display = "none";
+        });
+
+        document.getElementById(serverId).style.display = "block";
       }
 
       function goBack() {
-        document.getElementById("server1").style.display = "none";
-        document.getElementById("server2").style.display = "none";
-        document.getElementById("server3").style.display = "none";
-        document.getElementById("server4").style.display = "none";
-
-        document.getElementById("server1Button").style.display = "inline-block";
-        document.getElementById("server2Button").style.display = "inline-block";
-        document.getElementById("server3Button").style.display = "inline-block";
-        document.getElementById("server4Button").style.display = "inline-block";
-        document.getElementById("instructions").style.display = "block";
-        document.querySelector("h1").style.display = "block";
+        document.getElementById("container").style.display = "flex";
+        document.getElementById("serverWrapper").style.display = "none";
         document.getElementById("backButton").style.display = "none";
+
+        // Hide all iframes
+        document.querySelectorAll("iframe").forEach((iframe) => {
+          iframe.style.display = "none";
+        });
       }
     </script>
   </body>
