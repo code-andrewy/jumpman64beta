@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Movie & TV Show Search</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      animation: fadeInDown 1s ease;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      animation: fadeIn 1s ease;
+    }
+
+    input#searchInput {
+      width: 60%;
+      padding: 12px 16px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      transition: all 0.4s ease;
+      background-color: #1f1f1f;
+      color: white;
+    }
+
+    input#searchInput:focus {
+      width: 70%;
+      background-color: #2a2a2a;
+    }
+
+    button#searchButton, button#backButton {
+      padding: 12px 20px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    button#searchButton {
+      background-color: #ffffff;
+      color: black;
+    }
+
+    button#searchButton:hover {
+      background-color: #ffffff;
+      transform: scale(1.05);
+    }
+
+    button#backButton {
+  background-color: #FFFFFF;
+  color: black;
+  position: absolute;
+  top: 20px;
+  right: 20px; /* changed from left to right */
+  z-index: 10000;
+  padding: 10px 16px; /* adjust size here */
+  font-size: 16px;     /* adjust font size here */
+  border-radius: 8px;
+}
+
+
+    button#backButton:hover {
+      background-color: #FFFFFF;
+      transform: scale(1.05);
+    }
+
+    #results {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      animation: fadeIn 1s ease;
+    }
+
+    .movie-card {
+      background-color: #1e1e1e;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+      opacity: 0;
+      animation: fadeInCard 0.5s forwards;
+    }
+
+    @keyframes fadeInCard {
+      to { opacity: 1; }
+    }
+
+    .movie-card:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.5); /* WHITE GLOW */
+}
+
+
+    .movie-card img {
+      width: 100%;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .movie-card:hover img {
+      transform: scale(1.02);
+    }
+
+    .movie-title {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .movie-overview {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #cccccc;
+    }
+
+    #playerContainer {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      background-color: #000;
+      animation: fadeIn 0.5s ease;
+    }
+
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      border-radius: 0;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #ffffff;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎬 Watch Movies & TV Shows</h1>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Enter movie or TV show name..." />
+    <button id="searchButton" onclick="searchContent()">Search</button>
+  </div>
+
+  <div id="results"></div>
+
+  <div id="playerContainer">
+    <button id="backButton" onclick="goBack()">🔙 Back to Search</button>
+    <iframe id="contentPlayer" src="" allowfullscreen></iframe>
+  </div>
+
+  <script>
+    const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzN2E0NTUzMzY3MWIzM2EwMWVhNmZhZGZhMjFmYTg4MyIsIm5iZiI6MTcyNTQ0NzU1OC45MzIsInN1YiI6IjY2ZDgzZDg2MDZkMjMxZWVkNDA5NjhmMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.rbW30MeDpOZbC0omQK8ECKiWl_d0IHrSdec-7IapdUI';
+
+    async function searchContent() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) {
+        alert("Please enter a movie or TV show name");
+        return;
+      }
+
+      const resultsDiv = document.getElementById('results');
+      const playerContainer = document.getElementById('playerContainer');
+      playerContainer.style.display = 'none';
+      resultsDiv.style.display = 'grid';
+      resultsDiv.innerHTML = '<div class="loading-spinner"></div>';
+
+      try {
+        const [movieResponse, tvResponse] = await Promise.all([
+          fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}`, {
+            headers: {
+              Authorization: `Bearer ${API_KEY}`,
+              'Content-Type': 'application/json;charset=utf-8'
+            }
+          }),
+          fetch(`https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(query)}`, {
+            headers: {
+              Authorization: `Bearer ${API_KEY}`,
+              'Content-Type': 'application/json;charset=utf-8'
+            }
+          })
+        ]);
+
+        if (!movieResponse.ok || !tvResponse.ok) {
+          throw new Error('Failed to fetch data from API');
+        }
+
+        const movieData = await movieResponse.json();
+        const tvData = await tvResponse.json();
+        const movies = movieData.results;
+        const tvShows = tvData.results;
+
+        resultsDiv.innerHTML = '';
+
+        if (movies.length === 0 && tvShows.length === 0) {
+          resultsDiv.innerHTML = '<p>No movies or TV shows found.</p>';
+          return;
+        }
+
+        movies.forEach(movie => {
+          if (movie.poster_path) {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            const posterPath = `https://image.tmdb.org/t/p/w300${movie.poster_path}`;
+            card.innerHTML = ` 
+              <img src="${posterPath}" alt="${movie.title}">
+              <div class="movie-title">${movie.title}</div>
+              <div class="movie-overview">${movie.overview ? movie.overview.substring(0, 100) + '...' : 'No description available.'}</div>
+            `;
+            card.addEventListener('click', () => {
+              showPlayer(movie.id, 'movie');
+            });
+            resultsDiv.appendChild(card);
+          }
+        });
+
+        tvShows.forEach(tvShow => {
+          if (tvShow.poster_path) {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            const posterPath = `https://image.tmdb.org/t/p/w300${tvShow.poster_path}`;
+            card.innerHTML = ` 
+              <img src="${posterPath}" alt="${tvShow.name}">
+              <div class="movie-title">${tvShow.name}</div>
+              <div class="movie-overview">${tvShow.overview ? tvShow.overview.substring(0, 100) + '...' : 'No description available.'}</div>
+            `;
+            card.addEventListener('click', () => {
+              const season = prompt("Enter the season number:");
+              const episode = prompt("Enter the episode number:");
+              showPlayer(tvShow.id, 'tv', season, episode);
+            });
+            resultsDiv.appendChild(card);
+          }
+        });
+
+      } catch (error) {
+        console.error('Error:', error);
+        resultsDiv.innerHTML = '<p>Something went wrong. Please try again later!</p>';
+      }
+    }
+
+    function showPlayer(tmdbId, type, season = null, episode = null) {
+      const resultsDiv = document.getElementById('results');
+      const playerContainer = document.getElementById('playerContainer');
+      const contentPlayer = document.getElementById('contentPlayer');
+
+      resultsDiv.style.display = 'none';
+      playerContainer.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+
+      if (type === 'movie') {
+        contentPlayer.src = `https://vidlink.pro/movie/${tmdbId}`;
+      } else if (type === 'tv' && season && episode) {
+        contentPlayer.src = `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}`;
+      }
+    }
+
+    function goBack() {
+      const resultsDiv = document.getElementById('results');
+      const playerContainer = document.getElementById('playerContainer');
+      const contentPlayer = document.getElementById('contentPlayer');
+
+      contentPlayer.src = '';
+      playerContainer.style.display = 'none';
+      resultsDiv.style.display = 'grid';
+      document.body.style.overflow = 'auto';
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        searchContent();
+      }
+    });
+  </script>
+
+</body>
+</html>
