@@ -325,7 +325,7 @@
         type();
       }
 
-      fetch("https://raw.githubusercontent.com/code-andrewy/cooltext/refs/heads/main/Text")
+      fetch("https://raw.githubusercontent.com/code-andrewy/cooltext/refs/heads/main/text")
         .then((r) => r.text())
         .then((data) => {
           const lines = data.split("\n").filter(Boolean);
