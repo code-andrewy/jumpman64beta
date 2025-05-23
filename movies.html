@@ -4,78 +4,76 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Servers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
+      * {
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
+
       body,
       html {
         margin: 0;
         padding: 0;
         height: 100%;
         width: 100%;
-        background-color: #121212;
-        color: white;
-        font-family: Arial, sans-serif;
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+        color: #ffffff;
       }
 
       #container {
-        height: 100%;
-        width: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
+        padding: 40px 20px;
         text-align: center;
       }
 
-      iframe {
-        border: none;
-        height: 100vh;
-        width: 100vw;
-        display: none;
-        margin-top: 20px;
-      }
-
-      #server1,
-      #server2,
-      #server3,
-      #server4 {
-        display: none;
-      }
-
       h1 {
-        color: white;
+        font-size: 36px;
         margin-bottom: 20px;
-        font-size: 32px;
+        font-weight: 600;
       }
 
       .instructions {
-        font-size: 20px;
-        color: #cccccc;
+        background-color: #1e1e1e;
+        padding: 25px;
+        border-radius: 15px;
+        max-width: 700px;
         margin-bottom: 30px;
-        line-height: 1.5;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
       }
 
-      .step {
-        margin-bottom: 15px;
+      .instructions p {
+        margin: 10px 0;
         font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .instructions p:first-child {
+        color: #ff4d4f;
+        font-weight: bold;
+        font-size: 20px;
       }
 
       button {
         padding: 15px 30px;
-        margin: 15px;
+        margin: 10px;
         font-size: 18px;
         cursor: pointer;
-        background-color: #ffffff;
+        background: #ffffff;
         color: #121212;
         border: none;
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        font-weight: 600;
+        transition: transform 0.3s ease, background-color 0.3s ease;
       }
 
       button:hover {
-        background-color: #f0f0f0;
-        color: #121212;
-        transform: scale(1.1);
+        background-color: #e0e0e0;
+        transform: scale(1.05);
       }
 
       #backButton {
@@ -85,17 +83,28 @@
         right: 20px;
         background-color: #ffffff;
         color: #121212;
-        border-radius: 10px;
         padding: 10px 20px;
-        cursor: pointer;
-        font-size: 18px;
-        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
+        border-radius: 12px;
+        font-size: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
       }
 
       #backButton:hover {
-        background-color: #f0f0f0;
-        transform: scale(1.1);
+        background-color: #dddddd;
+      }
+
+      iframe {
+        border: none;
+        height: 100vh;
+        width: 100vw;
+        display: none;
+      }
+
+      #server1,
+      #server2,
+      #server3,
+      #server4 {
+        display: none;
       }
     </style>
   </head>
@@ -103,24 +112,12 @@
     <div id="container">
       <h1>Choose Your Server</h1>
       <div class="instructions" id="instructions">
-        <p style="color: red; font-weight: bold; font-size: 20px;">
-          ⚠️ WARNING: Do NOT click on any popups or ads. If a link opens in a new tab, close it immediately!
-        </p>
-        <p class="step">
-          Step 1: Click one of the buttons below to select a server. If you were wondering, Server 1 was the original.
-        </p>
-        <p class="step">
-          Step 2: If Server 1 is not working or you cannot access it, try using Server 2.
-        </p>
-        <p class="step">
-          Step 3: If neither Server 1 nor Server 2 work for you, try Server 3 as an alternative.
-        </p>
-        <p class="step">
-          Step 4: If Server 3 also doesn't work, try Server 4, which may have a different set of options.
-        </p>
-        <p class="step">
-          Step 5: Once you select a server, you can click the "Back" button to return to the server selection screen.
-        </p>
+        <p>⚠️ WARNING: Do NOT click on any popups or ads. If a link opens in a new tab, close it immediately!</p>
+        <p>Step 1: Click one of the buttons below to select a server. If you were wondering, Server 1 was the original.</p>
+        <p>Step 2: If Server 1 is not working or you cannot access it, try using Server 2.</p>
+        <p>Step 3: If neither Server 1 nor Server 2 work for you, try Server 3 as an alternative.</p>
+        <p>Step 4: If Server 3 also doesn't work, try Server 4, which may have a different set of options.</p>
+        <p>Step 5: Once you select a server, you can click the "Back" button to return to the server selection screen.</p>
       </div>
 
       <button id="server1Button" onclick="openServer('server1')">Server 1</button>
