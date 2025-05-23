@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Servers</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        background-color: #121212; /* Dark background */
+        color: white; /* White text */
+        font-family: Arial, sans-serif; /* Clean font */
+      }
+
+      #container {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+      }
+
+      iframe {
+        border: none;
+        height: 100vh; /* Full viewport height */
+        width: 100vw; /* Full viewport width */
+        display: none;
+        margin-top: 20px;
+      }
+
+      #server1,
+      #server2,
+      #server3,
+      #server4 {
+        display: none;
+      }
+
+      h1 {
+        color: white;
+        margin-bottom: 20px;
+        font-size: 32px;
+      }
+
+      .instructions {
+        font-size: 20px;
+        color: #cccccc;
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .step {
+        margin-bottom: 15px;
+        font-size: 18px;
+      }
+
+      button {
+        padding: 15px 30px;
+        margin: 15px;
+        font-size: 18px;
+        cursor: pointer;
+        background-color: #ffffff; /* White background for buttons */
+        color: #121212; /* Dark text */
+        border: none;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover {
+        background-color: #f0f0f0; /* Light gray background on hover */
+        color: #121212; /* Text color changes to dark */
+        transform: scale(1.1); /* Slightly enlarge button on hover */
+      }
+
+      #backButton {
+        display: none;
+        position: fixed;
+        top: 20px; /* Position it at the top */
+        right: 20px; /* Position it at the right */
+        background-color: #ffffff;
+        color: #121212;
+        border-radius: 10px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 18px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      #backButton:hover {
+        background-color: #f0f0f0;
+        transform: scale(1.1); /* Slightly enlarge the button */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <h1>Choose Your Server</h1>
+      <div class="instructions" id="instructions">
+        <p class="step">
+          Step 1: Click one of the buttons below to select a server. if you were wondering server 1 was the original 
+        </p>
+        <p class="step">
+          Step 2: If Server 1 is not working or you cannot access it, try using
+          Server 2.
+        </p>
+        <p class="step">
+          Step 3: If neither Server 1 nor Server 2 work for you, try Server 3 as
+          an alternative.
+        </p>
+        <p class="step">
+          Step 4: If Server 3 also doesn't work, try Server 4, which may have a
+          different set of options.
+        </p>
+        <p class="step">
+          Step 5: Once you select a server, you can click the "Back" button to
+          return to the server selection screen.
+        </p>
+      </div>
+
+      <button id="server1Button" onclick="openServer('server1')">
+        Server 1
+      </button>
+      <button id="server2Button" onclick="openServer('server2')">
+        Server 2
+      </button>
+      <button id="server3Button" onclick="openServer('server3')">
+        Server 3
+      </button>
+      <button id="server4Button" onclick="openServer('server4')">
+        Server 4
+      </button>
+
+      <button id="backButton" onclick="goBack()">Back</button>
+
+      <iframe id="server1" src="https://bitt-movies.glitch.me/"></iframe>
+      <iframe id="server2" src="https://bittmovies2.glitch.me/"></iframe>
+      <iframe id="server3" src="https://xprime.tv/"></iframe>
+      <iframe id="server4" src="https://ww25.soap2day.day/"></iframe>
+    </div>
+
+    <script>
+      function openServer(server) {
+        // Hide all iframes
+        document.getElementById("server1").style.display = "none";
+        document.getElementById("server2").style.display = "none";
+        document.getElementById("server3").style.display = "none";
+        document.getElementById("server4").style.display = "none";
+
+        // Hide the "Choose Your Server" heading
+        document.querySelector("h1").style.display = "none";
+
+        // Display the selected iframe
+        if (server === "server1") {
+          document.getElementById("server1").style.display = "block";
+        } else if (server === "server2") {
+          document.getElementById("server2").style.display = "block";
+        } else if (server === "server3") {
+          document.getElementById("server3").style.display = "block";
+        } else if (server === "server4") {
+          document.getElementById("server4").style.display = "block";
+        }
+
+        // Hide the server buttons and instructions, and show the back button
+        document.getElementById("server1Button").style.display = "none";
+        document.getElementById("server2Button").style.display = "none";
+        document.getElementById("server3Button").style.display = "none";
+        document.getElementById("server4Button").style.display = "none";
+        document.getElementById("instructions").style.display = "none"; // Hide instructions
+        document.getElementById("backButton").style.display = "inline-block";
+      }
+
+      function goBack() {
+        // Hide all iframes
+        document.getElementById("server1").style.display = "none";
+        document.getElementById("server2").style.display = "none";
+        document.getElementById("server3").style.display = "none";
+        document.getElementById("server4").style.display = "none";
+
+        // Show the server buttons, instructions, and hide the back button
+        document.getElementById("server1Button").style.display = "inline-block";
+        document.getElementById("server2Button").style.display = "inline-block";
+        document.getElementById("server3Button").style.display = "inline-block";
+        document.getElementById("server4Button").style.display = "inline-block";
+        document.getElementById("instructions").style.display = "block"; // Show instructions
+        document.querySelector("h1").style.display = "block"; // Show the heading again
+        document.getElementById("backButton").style.display = "none";
+      }
+    </script>
+  </body>
+</html>
