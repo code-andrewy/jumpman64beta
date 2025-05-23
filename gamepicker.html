@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Embedded Game Picker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #111;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    #overlayContent {
+      background: #222;
+      padding: 2rem;
+      border-radius: 1rem;
+      text-align: center;
+      max-width: 400px;
+      box-shadow: 0 0 10px #000;
+    }
+
+    #overlayContent h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      margin: 0 1rem;
+      padding: 0.6rem 1.3rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      background: #444;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #666;
+    }
+
+    #gameFrame {
+      flex-grow: 1;
+      width: 100%;
+      border: none;
+      display: none;
+    }
+
+    html, body {
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <div id="overlayContent">
+      <h2>Loading game suggestion...</h2>
+      <button id="yesButton" style="display:none;">Yes</button>
+      <button id="noButton" style="display:none;">No, show me something else </button>
+    </div>
+  </div>
+
+  <iframe id="gameFrame"></iframe>
+
+  <script>
+    const overlay = document.getElementById("overlay");
+    const overlayText = document.querySelector("#overlayContent h2");
+    const yesButton = document.getElementById("yesButton");
+    const noButton = document.getElementById("noButton");
+    const gameFrame = document.getElementById("gameFrame");
+
+    let games = [];
+
+    function pickRandomGame() {
+      const game = games[Math.floor(Math.random() * games.length)];
+      overlayText.textContent = `Do you want to play "${game.name}"?`;
+      yesButton.onclick = () => {
+        overlay.style.display = "none";
+        gameFrame.src = game.url;
+        gameFrame.style.display = "block";
+      };
+      noButton.onclick = pickRandomGame;
+    }
+
+    fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt")
+      .then((r) => r.text())
+      .then((data) => {
+        const entries = data.split("Website url:").slice(1);
+        games = entries.map((entry) => {
+          const [url, name, image] = entry
+            .split(/Game name:|Image url:/)
+            .map((x) => x.trim());
+          return { url, name, imageUrl: image };
+        }).filter((g) => g.url && g.name && g.imageUrl);
+
+        if (games.length === 0) {
+          overlayText.textContent = "No games found.";
+          return;
+        }
+
+        yesButton.style.display = "inline-block";
+        noButton.style.display = "inline-block";
+        pickRandomGame();
+      })
+      .catch(() => {
+        overlayText.textContent = "Failed to load games.";
+      });
+  </script>
+</body>
+</html>
