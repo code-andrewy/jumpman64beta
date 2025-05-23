@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embed Website on Button Click</title>
+    <style>
+        /* Basic styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #2c2c2c, #1a1a1a);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+            color: white;
+            position: relative;
+        }
+
+        /* Button container */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* Button styling */
+        button {
+            font-size: 20px;
+            padding: 15px 30px;
+            cursor: pointer;
+            border: 2px solid #444;
+            border-radius: 10px;
+            background-color: #333;
+            color: white;
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #555;
+            transform: scale(1.1);
+        }
+
+        /* Game containers */
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+        }
+
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+        }
+
+        /* Back button */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+        }
+
+        .back-button.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Buttons to trigger embedding -->
+    <div class="button-container">
+        <button id="embedButton1">MC 1.20</button>
+        <button id="embedButton2">MC 1.12.2</button>
+        <button id="embedButton3">MC 1.8.8</button>
+    </div>
+
+    <!-- Container for the embedded website -->
+    <div id="embedContainer"></div>
+
+    <button class="back-button" id="backButton" onclick="goBack()">🔙 Back</button>
+
+    <script>
+        // Get the buttons and embed container
+        const button1 = document.getElementById('embedButton1');
+        const button2 = document.getElementById('embedButton2');
+        const button3 = document.getElementById('embedButton3');
+        const container = document.getElementById('embedContainer');
+
+        // Add event listener for the first button (MC 1.20)
+        button1.addEventListener('click', function() {
+            loadGame('https://eaglymc.com/', 'mcFrameContainer');
+        });
+
+        // Add event listener for the second button (MC 1.12.2)
+        button2.addEventListener('click', function() {
+            loadGame('https://eaglercraft.com/mc/1.12.2/', 'mc1122FrameContainer');
+        });
+
+        // Add event listener for the third button (MC 1.8.8)
+        button3.addEventListener('click', function() {
+            loadGame('https://eaglercraft.com/mc/1.8.8/', 'mc188FrameContainer');
+        });
+
+        function loadGame(url, containerId) {
+            // Create and display iframe
+            let iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.style.width = '100vw'; // Ensures it takes full width of the viewport
+            iframe.style.height = '100vh'; // Ensures it takes full height of the viewport
+            iframe.style.border = 'none';
+
+            // Clear the previous content and add the new iframe
+            container.innerHTML = '';
+            container.appendChild(iframe);
+
+            // Show the back button and hide the button container
+            document.getElementById("backButton").classList.add('show');
+            document.querySelector(".button-container").style.display = 'none';
+        }
+
+        function goBack() {
+            // Hide the iframe and display the button container again
+            container.innerHTML = '';
+            document.getElementById("backButton").classList.remove('show');
+            document.querySelector(".button-container").style.display = 'flex';
+        }
+    </script>
+
+</body>
+</html>
