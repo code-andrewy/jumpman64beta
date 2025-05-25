@@ -211,7 +211,7 @@
         }).filter((g) => g.url && g.name && g.imageUrl);
 
         if (games.length === 0) {
-          overlayText.textContent = "No games found.";
+          overlayText.textContent = "No games found :( ";
           return;
         }
 
@@ -220,7 +220,7 @@
         pickRandomGame();
       })
       .catch(() => {
-        overlayText.textContent = "Failed to load games :(";
+        overlayText.textContent = "Failed to load games :( ";
       });
   </script>
 </body>
