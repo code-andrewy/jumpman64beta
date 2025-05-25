@@ -39,7 +39,7 @@
     }
 
     button {
-      margin: 0 1rem;
+      margin: 0 0.5rem;
       padding: 0.6rem 1.3rem;
       font-size: 1rem;
       border: none;
@@ -69,9 +69,9 @@
 <body>
   <div id="overlay">
     <div id="overlayContent">
-      <h2>Loading game suggestion...</h2>
+      <h2>Loading a game suggestion...</h2>
       <button id="yesButton" style="display:none;">Yes</button>
-      <button id="noButton" style="display:none;">No, show me something else </button>
+      <button id="noButton" style="display:none;">No</button>
     </div>
   </div>
 
@@ -85,17 +85,37 @@
     const gameFrame = document.getElementById("gameFrame");
 
     let games = [];
+    let lastPickedIndex = -1;
 
     function pickRandomGame() {
-      const game = games[Math.floor(Math.random() * games.length)];
+      if (games.length === 0) return;
+
+      let index;
+      do {
+        index = Math.floor(Math.random() * games.length);
+      } while (index === lastPickedIndex && games.length > 1);
+
+      lastPickedIndex = index;
+      const game = games[index];
+
       overlayText.textContent = `Do you want to play "${game.name}"?`;
+
       yesButton.onclick = () => {
         overlay.style.display = "none";
         gameFrame.src = game.url;
         gameFrame.style.display = "block";
       };
+
       noButton.onclick = pickRandomGame;
     }
+
+    // Use space to click the focused button
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && document.activeElement.tagName === "BUTTON") {
+        e.preventDefault(); // stop page scrolling
+        document.activeElement.click();
+      }
+    });
 
     fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt")
       .then((r) => r.text())
@@ -116,6 +136,7 @@
         yesButton.style.display = "inline-block";
         noButton.style.display = "inline-block";
         pickRandomGame();
+        yesButton.focus(); // focus Yes by default
       })
       .catch(() => {
         overlayText.textContent = "Failed to load games.";
