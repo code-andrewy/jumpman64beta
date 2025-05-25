@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Embedded Game Picker</title>
+  <title>Game Picker</title>
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
-      background: #111;
+      font-family: "Segoe UI", sans-serif;
+      background: #0f0f0f;
       color: white;
       display: flex;
       flex-direction: column;
       align-items: center;
       height: 100vh;
+      overflow: hidden;
     }
 
     #overlay {
@@ -23,35 +24,102 @@
       justify-content: center;
       align-items: center;
       z-index: 10;
+      animation: fadeIn 0.5s ease;
     }
 
     #overlayContent {
-      background: #222;
+      background: #1a1a1a;
       padding: 2rem;
       border-radius: 1rem;
       text-align: center;
-      max-width: 400px;
-      box-shadow: 0 0 10px #000;
+      max-width: 420px;
+      width: 90%;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      transition: box-shadow 0.3s ease;
+    }
+
+    #imageWrapper {
+      position: relative;
+      height: 200px;
+      margin-bottom: 1rem;
+      background: #000;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #gameImage {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.3s ease;
+    }
+
+    #gameImage.loaded {
+      opacity: 1;
+    }
+
+    #gameImage:hover {
+      transform: scale(1.03);
+    }
+
+    #loader {
+      border: 4px solid #333;
+      border-top: 4px solid white;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     #overlayContent h2 {
-      margin-bottom: 1.5rem;
+      margin: 1rem 0;
+      font-size: 1.25rem;
+      transition: text-shadow 0.3s ease;
+    }
+
+    #overlayContent h2:hover {
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
     }
 
     button {
       margin: 0 0.5rem;
-      padding: 0.6rem 1.3rem;
+      padding: 0.7rem 1.5rem;
       font-size: 1rem;
       border: none;
       border-radius: 0.5rem;
       cursor: pointer;
-      background: #444;
+      background: #2c2c2c;
       color: white;
-      transition: background 0.3s;
+      transition: background 0.3s, transform 0.2s ease, box-shadow 0.3s ease;
     }
 
     button:hover {
-      background: #666;
+      background: #444;
+      transform: scale(1.05);
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    }
+
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px white;
+    }
+
+    button:active {
+      transform: scale(0.96);
     }
 
     #gameFrame {
@@ -60,15 +128,15 @@
       border: none;
       display: none;
     }
-
-    html, body {
-      height: 100%;
-    }
   </style>
 </head>
 <body>
   <div id="overlay">
     <div id="overlayContent">
+      <div id="imageWrapper">
+        <div id="loader"></div>
+        <img id="gameImage" src="" alt="Game preview" />
+      </div>
       <h2>Loading a game suggestion...</h2>
       <button id="yesButton" style="display:none;">Yes</button>
       <button id="noButton" style="display:none;">No</button>
@@ -83,6 +151,8 @@
     const yesButton = document.getElementById("yesButton");
     const noButton = document.getElementById("noButton");
     const gameFrame = document.getElementById("gameFrame");
+    const gameImage = document.getElementById("gameImage");
+    const loader = document.getElementById("loader");
 
     let games = [];
     let lastPickedIndex = -1;
@@ -98,7 +168,19 @@
       lastPickedIndex = index;
       const game = games[index];
 
-      overlayText.textContent = `Do you want to play "${game.name}"?`;
+      overlayText.textContent = `Want to play "${game.name}"?`;
+
+      gameImage.classList.remove("loaded");
+      gameImage.style.display = "none";
+      loader.style.display = "block";
+
+      gameImage.onload = () => {
+        loader.style.display = "none";
+        gameImage.style.display = "block";
+        setTimeout(() => gameImage.classList.add("loaded"), 50);
+      };
+
+      gameImage.src = game.imageUrl;
 
       yesButton.onclick = () => {
         overlay.style.display = "none";
@@ -107,12 +189,12 @@
       };
 
       noButton.onclick = pickRandomGame;
+      yesButton.focus();
     }
 
-    // Use space to click the focused button
     document.addEventListener("keydown", (e) => {
       if (e.code === "Space" && document.activeElement.tagName === "BUTTON") {
-        e.preventDefault(); // stop page scrolling
+        e.preventDefault();
         document.activeElement.click();
       }
     });
@@ -136,7 +218,6 @@
         yesButton.style.display = "inline-block";
         noButton.style.display = "inline-block";
         pickRandomGame();
-        yesButton.focus(); // focus Yes by default
       })
       .catch(() => {
         overlayText.textContent = "Failed to load games.";
