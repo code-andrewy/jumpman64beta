@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Movie & TV Show Search with Wikipedia Suggestions</title>
+  <title>Movie & TV Show Search</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -34,20 +34,15 @@
 
     .search-container {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
       gap: 10px;
       margin-bottom: 20px;
       flex-wrap: wrap;
       animation: fadeIn 1s ease;
-      position: relative;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
     }
 
     input#searchInput {
-      width: 100%;
+      width: 60%;
       padding: 12px 16px;
       font-size: 18px;
       border-radius: 10px;
@@ -56,14 +51,14 @@
       transition: all 0.4s ease;
       background-color: #1f1f1f;
       color: white;
-      box-sizing: border-box;
     }
 
     input#searchInput:focus {
+      width: 70%;
       background-color: #2a2a2a;
     }
 
-    button#searchButton {
+    button#searchButton, button#backButton {
       padding: 12px 20px;
       font-size: 18px;
       border-radius: 10px;
@@ -71,43 +66,31 @@
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    button#searchButton {
       background-color: #ffffff;
       color: black;
-      width: 150px;
     }
 
     button#searchButton:hover {
       transform: scale(1.05);
     }
 
-    ul#wikiSuggestions {
+    button#backButton {
+      background-color: #FFFFFF;
+      color: black;
       position: absolute;
-      top: 50px;
-      width: 100%;
-      max-height: 200px;
-      overflow-y: auto;
-      background: #222;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      padding: 10px 16px;
+      font-size: 16px;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-      z-index: 1000;
-      color: #eee;
     }
 
-    ul#wikiSuggestions li {
-      padding: 10px 15px;
-      cursor: pointer;
-      border-bottom: 1px solid #333;
-    }
-
-    ul#wikiSuggestions li:last-child {
-      border-bottom: none;
-    }
-
-    ul#wikiSuggestions li:hover {
-      background-color: #555;
+    button#backButton:hover {
+      transform: scale(1.05);
     }
 
     #results, #trending {
@@ -180,25 +163,6 @@
       border-radius: 0;
     }
 
-    button#backButton {
-      background-color: #FFFFFF;
-      color: black;
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 10000;
-      padding: 10px 16px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
-
-    button#backButton:hover {
-      transform: scale(1.05);
-    }
-
     .loading-spinner {
       display: inline-block;
       border: 4px solid rgba(255, 255, 255, 0.3);
@@ -230,7 +194,6 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      max-width: 200px;
     }
   </style>
 </head>
@@ -238,8 +201,7 @@
   <h1>🎬 Watch Movies & TV Shows</h1>
 
   <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Enter movie or TV show name..." autocomplete="off" />
-    <ul id="wikiSuggestions" style="display:none;"></ul>
+    <input type="text" id="searchInput" placeholder="Enter movie or TV show name..." />
     <button id="searchButton" onclick="searchContent()">Search</button>
   </div>
 
@@ -258,13 +220,12 @@
   </div>
 
   <script>
-    const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzN2E0NTUzMzY3MWIzM2EwMWVhNmZhZGZhMjFmYTg4MyIsIm5iZiI6MTcyNTQ0NzU1OC45MzIsInN1YiI6IjY2ZDgzZDg2MDZkMjMxZWVkNDA5NjhmMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.rbW30MeDpOZbC0omQK8ECKiWl_d0IHrSdec-7IapdUI'; // Replace with your actual key
+    const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMDBiMDIzOWQzNGY5YzI0Yjc2MzM5Mjg2YjNlOWNiMSIsIm5iZiI6MTc0ODUwMzgzMS43NjMsInN1YiI6IjY4MzgwZDE3MDc5YTQyZTI4NzAzODYyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ykvYVrw8wjBdjkeb-71y1n1Z8ng3xE5ciodJ6FZgrNw'; // Truncated for safety
 
     let trendingData = [], resultsData = [];
     let trendingIndex = 0, resultsIndex = 0;
     const ITEMS_PER_PAGE = 15;
 
-    // Render movie/tv items
     function renderItems(data, containerId, index, isMovieCheck = true) {
       const container = document.getElementById(containerId);
       const nextBatch = data.slice(index, index + ITEMS_PER_PAGE);
@@ -287,9 +248,7 @@
             } else {
               const season = prompt("Enter the season number:");
               const episode = prompt("Enter the episode number:");
-              if (season && episode) {
-                showPlayer(item.id, 'tv', season, episode);
-              }
+              showPlayer(item.id, 'tv', season, episode);
             }
           });
           container.appendChild(card);
@@ -341,10 +300,9 @@
       }
     }
 
-    async function searchContent(query=null) {
-      const input = document.getElementById('searchInput');
-      const searchTerm = query || input.value.trim();
-      if (!searchTerm) return alert("Please enter a movie or TV show name");
+    async function searchContent() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return alert("Please enter a movie or TV show name");
 
       const resultsDiv = document.getElementById('results');
       const trendingSection = document.getElementById('homeContent');
@@ -352,15 +310,12 @@
       trendingSection.style.display = 'none';
       resultsDiv.innerHTML = '<div class="loading-spinner"></div>';
 
-      // Hide Wikipedia suggestions on search
-      hideWikiSuggestions();
-
       try {
         const [movieResponse, tvResponse] = await Promise.all([
-          fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(searchTerm)}`, {
+          fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}`, {
             headers: { Authorization: `Bearer ${API_KEY}` }
           }),
-          fetch(`https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(searchTerm)}`, {
+          fetch(`https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(query)}`, {
             headers: { Authorization: `Bearer ${API_KEY}` }
           })
         ]);
@@ -376,55 +331,6 @@
       } catch (error) {
         resultsDiv.innerHTML = '<p>Something went wrong. Please try again later!</p>';
       }
-    }
-
-    // Wikipedia suggestions
-    const wikiSuggestions = document.getElementById('wikiSuggestions');
-    let wikiTimeout = null;
-
-    document.getElementById('searchInput').addEventListener('input', () => {
-      const val = document.getElementById('searchInput').value.trim();
-      if (val.length < 2) {
-        hideWikiSuggestions();
-        return;
-      }
-      if (wikiTimeout) clearTimeout(wikiTimeout);
-      wikiTimeout = setTimeout(() => {
-        fetchWikiSuggestions(val);
-      }, 300);
-    });
-
-    async function fetchWikiSuggestions(query) {
-      try {
-        const response = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=8&namespace=0&format=json&origin=*`);
-        const data = await response.json();
-        const suggestions = data[1]; // The array of suggestion titles
-
-        if (suggestions.length === 0) {
-          hideWikiSuggestions();
-          return;
-        }
-
-        wikiSuggestions.innerHTML = '';
-        suggestions.forEach(title => {
-          const li = document.createElement('li');
-          li.textContent = title;
-          li.onclick = () => {
-            document.getElementById('searchInput').value = title;
-            searchContent(title);
-            hideWikiSuggestions();
-          };
-          wikiSuggestions.appendChild(li);
-        });
-        wikiSuggestions.style.display = 'block';
-      } catch (error) {
-        hideWikiSuggestions();
-      }
-    }
-
-    function hideWikiSuggestions() {
-      wikiSuggestions.style.display = 'none';
-      wikiSuggestions.innerHTML = '';
     }
 
     function showPlayer(tmdbId, type, season = null, episode = null) {
@@ -448,9 +354,7 @@
 
     document.getElementById('searchInput').addEventListener('keydown', function(event) {
       if (event.key === 'Enter') {
-        event.preventDefault(); // prevent form submission if inside one
         searchContent();
-        hideWikiSuggestions();
       }
     });
 
