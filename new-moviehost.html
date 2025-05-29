@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jumpman64 Embed</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #222;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .button-bar {
+      background-color: #333;
+      padding: 15px 0;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.7);
+      transition: opacity 0.8s ease, height 0.8s ease, padding 0.8s ease;
+    }
+
+    button {
+      background-color: #666;
+      border: none;
+      border-radius: 6px;
+      color: #eee;
+      font-size: 18px;
+      font-weight: 600;
+      padding: 12px 28px;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    button:hover, button:focus {
+      background-color: #888;
+      outline: none;
+      box-shadow: 0 4px 10px #aaa;
+    }
+
+    iframe {
+      flex-grow: 1;
+      width: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Hidden state for button bar */
+    .hidden {
+      opacity: 0;
+      height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="button-bar" id="buttonBar">
+    <button onclick="embedAndHide('https://code-andrewy.github.io/jumpman64beta/host.html')">Host View</button>
+    <button onclick="embedAndHide('https://code-andrewy.github.io/jumpman64beta/player2')">Player 2 View</button>
+  </div>
+
+  <iframe id="embedFrame" src="about:blank" allowfullscreen></iframe>
+
+  <script>
+    const buttonBar = document.getElementById('buttonBar');
+    const iframe = document.getElementById('embedFrame');
+
+    function embedAndHide(url) {
+      iframe.src = url;
+
+      // Hide buttons with animation
+      buttonBar.classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>
