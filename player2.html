@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Movie & TV</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      animation: fadeInDown 1s ease;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      animation: fadeIn 1s ease;
+    }
+
+    input#searchInput {
+      width: 60%;
+      padding: 12px 16px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      transition: all 0.4s ease;
+      background-color: #1f1f1f;
+      color: white;
+    }
+
+    input#searchInput:focus {
+      width: 70%;
+      background-color: #2a2a2a;
+    }
+
+    button#searchButton, button#backButton {
+      padding: 12px 20px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    button#searchButton {
+      background-color: #ffffff;
+      color: black;
+    }
+
+    button#searchButton:hover {
+      transform: scale(1.05);
+    }
+
+    button#backButton {
+      background-color: #FFFFFF;
+      color: black;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      padding: 10px 16px;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+
+    button#backButton:hover {
+      transform: scale(1.05);
+    }
+
+    #results, #trending {
+      margin-top: 30px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      animation: fadeIn 1s ease;
+    }
+
+    .movie-card {
+      background-color: #1e1e1e;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+      opacity: 0;
+      animation: fadeInCard 0.5s forwards;
+    }
+
+    @keyframes fadeInCard {
+      to { opacity: 1; }
+    }
+
+    .movie-card:hover {
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 0 15px 4px rgba(255, 255, 255, 0.5);
+    }
+
+    .movie-card img {
+      width: 100%;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .movie-card:hover img {
+      transform: scale(1.02);
+    }
+
+    .movie-title {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .movie-overview {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #cccccc;
+    }
+
+    #playerContainer {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      background-color: #000;
+      animation: fadeIn 0.5s ease;
+    }
+
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      border-radius: 0;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #ffffff;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .show-more {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎬 Watch Movies & TV Shows</h1>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Enter movie or TV show name..." />
+    <button id="searchButton" onclick="searchContent()">Search</button>
+  </div>
+
+  <div id="homeContent">
+    <h2>🔥 Trending</h2>
+    <div id="trending"></div>
+    <button id="showMoreTrending" class="show-more" onclick="showMore('trending')" style="display: none;">Show More</button>
+  </div>
+
+  <div id="results"></div>
+  <button id="showMoreResults" class="show-more" onclick="showMore('results')" style="display: none;">Show More</button>
+
+  <div id="playerContainer">
+    <button id="backButton" onclick="goBack()">🔙 Back to Search</button>
+    <iframe id="contentPlayer" src="" allowfullscreen></iframe>
+  </div>
+
+  <script>
+    const API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIxMDBiMDIzOWQzNGY5YzI0Yjc2MzM5Mjg2YjNlOWNiMSIsIm5iZiI6MTc0ODUwMzgzMS43NjMsInN1YiI6IjY4MzgwZDE3MDc5YTQyZTI4NzAzODYyMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ykvYVrw8wjBdjkeb-71y1n1Z8ng3xE5ciodJ6FZgrNw'; // Truncated for safety
+
+    let trendingData = [], resultsData = [];
+    let trendingIndex = 0, resultsIndex = 0;
+    const ITEMS_PER_PAGE = 15;
+
+    function renderItems(data, containerId, index, isMovieCheck = true) {
+      const container = document.getElementById(containerId);
+      const nextBatch = data.slice(index, index + ITEMS_PER_PAGE);
+
+      nextBatch.forEach(item => {
+        if (item.poster_path) {
+          const isMovie = isMovieCheck ? !!item.title : item.media_type !== 'tv';
+          const card = document.createElement('div');
+          card.className = 'movie-card';
+          const posterPath = `https://image.tmdb.org/t/p/w300${item.poster_path}`;
+          const title = isMovie ? item.title : item.name;
+          card.innerHTML = `
+            <img src="${posterPath}" alt="${title}">
+            <div class="movie-title">${title}</div>
+            <div class="movie-overview">${item.overview ? item.overview.substring(0, 100) + '...' : 'No description available.'}</div>
+          `;
+          card.addEventListener('click', () => {
+            if (isMovie) {
+              showPlayer(item.id, 'movie');
+            } else {
+              const season = prompt("Enter the season number:");
+              const episode = prompt("Enter the episode number:");
+              showPlayer(item.id, 'tv', season, episode);
+            }
+          });
+          container.appendChild(card);
+        }
+      });
+
+      return index + ITEMS_PER_PAGE;
+    }
+
+    function showMore(type) {
+      if (type === 'trending') {
+        trendingIndex = renderItems(trendingData, 'trending', trendingIndex);
+        if (trendingIndex >= trendingData.length) {
+          document.getElementById('showMoreTrending').style.display = 'none';
+        }
+      } else if (type === 'results') {
+        resultsIndex = renderItems(resultsData, 'results', resultsIndex, false);
+        if (resultsIndex >= resultsData.length) {
+          document.getElementById('showMoreResults').style.display = 'none';
+        }
+      }
+    }
+
+    async function loadTrending() {
+      const trendingContainer = document.getElementById('trending');
+      trendingContainer.innerHTML = '<div class="loading-spinner"></div>';
+
+      try {
+        const [movieTrending, tvTrending] = await Promise.all([
+          fetch(`https://api.themoviedb.org/3/trending/movie/week`, {
+            headers: { Authorization: `Bearer ${API_KEY}` }
+          }),
+          fetch(`https://api.themoviedb.org/3/trending/tv/week`, {
+            headers: { Authorization: `Bearer ${API_KEY}` }
+          })
+        ]);
+
+        const movieData = await movieTrending.json();
+        const tvData = await tvTrending.json();
+        trendingData = [...movieData.results, ...tvData.results];
+        trendingData.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+        trendingIndex = 0;
+
+        trendingContainer.innerHTML = '';
+        document.getElementById('showMoreTrending').style.display = 'block';
+        showMore('trending');
+      } catch (error) {
+        trendingContainer.innerHTML = '<p>Failed to load trending content.</p>';
+      }
+    }
+
+    async function searchContent() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return alert("Please enter a movie or TV show name");
+
+      const resultsDiv = document.getElementById('results');
+      const trendingSection = document.getElementById('homeContent');
+      resultsDiv.style.display = 'grid';
+      trendingSection.style.display = 'none';
+      resultsDiv.innerHTML = '<div class="loading-spinner"></div>';
+
+      try {
+        const [movieResponse, tvResponse] = await Promise.all([
+          fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(query)}`, {
+            headers: { Authorization: `Bearer ${API_KEY}` }
+          }),
+          fetch(`https://api.themoviedb.org/3/search/tv?query=${encodeURIComponent(query)}`, {
+            headers: { Authorization: `Bearer ${API_KEY}` }
+          })
+        ]);
+
+        const movieData = await movieResponse.json();
+        const tvData = await tvResponse.json();
+        resultsData = [...movieData.results, ...tvData.results];
+        resultsIndex = 0;
+
+        resultsDiv.innerHTML = '';
+        document.getElementById('showMoreResults').style.display = 'block';
+        showMore('results');
+      } catch (error) {
+        resultsDiv.innerHTML = '<p>Something went wrong. Please try again later!</p>';
+      }
+    }
+
+    function showPlayer(tmdbId, type, season = null, episode = null) {
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('playerContainer').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+
+      const playerUrl = type === 'movie'
+        ? `https://embed.su/embed/movie/${tmdbId}`
+        : `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}`;
+
+      document.getElementById('contentPlayer').src = playerUrl;
+    }
+
+    function goBack() {
+      document.getElementById('contentPlayer').src = '';
+      document.getElementById('playerContainer').style.display = 'none';
+      document.getElementById('results').style.display = 'grid';
+      document.body.style.overflow = 'auto';
+    }
+
+    document.getElementById('searchInput').addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        searchContent();
+      }
+    });
+
+    window.onload = function() {
+      loadTrending();
+    };
+  </script>
+</body>
+</html>
