@@ -1,473 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clever</title>
-    <style>
-      :root {
-        --bg: #121212;
-        --card: #1e1e1e;
-        --accent: #000000;
-        --text: #f5f5f5;
-        --text-muted: #bbbbbb;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clever</title>
+  <style>
+    :root {
+      --bg: #121212;
+      --card: #1e1e1e;
+      --accent: #000000;
+      --text: #f5f5f5;
+      --text-muted: #bbbbbb;
+    }
 
-      body {
-        margin: 0;
-        background-color: var(--bg);
-        font-family: "Segoe UI", sans-serif;
-        color: var(--text);
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        opacity: 0;
-        animation: fadeIn 1s forwards;
-      }
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      font-family: "Segoe UI", sans-serif;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      opacity: 0;
+      animation: fadeIn 1s forwards;
+    }
 
-      header {
-        background-color: #333;
-        padding: 1rem;
-        text-align: center;
-        color: white;
-        font-size: 1.3rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        animation: slideInFromTop 0.5s ease-in-out;
-      }
+    header {
+      background-color: #333;
+      padding: 1rem;
+      text-align: center;
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      animation: slideInFromTop 0.5s ease-in-out;
+    }
 
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-      @keyframes slideInFromTop {
-        from {
-          transform: translateY(-50px);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
-      }
+    @keyframes slideInFromTop {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
 
-      #searchBar {
-        margin: 2rem auto 1rem;
-        display: block;
-        width: 85%;
-        max-width: 600px;
-        padding: 1rem 1.2rem;
-        border-radius: 12px;
-        border: none;
-        background-color: var(--card);
-        color: var(--text);
-        font-size: 1.1rem;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      }
+    #searchBar {
+      margin: 2rem auto 1rem;
+      display: block;
+      width: 85%;
+      max-width: 600px;
+      padding: 1rem 1.2rem;
+      border-radius: 12px;
+      border: none;
+      background-color: var(--card);
+      color: var(--text);
+      font-size: 1.1rem;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
 
-      #searchBar:focus {
-        width: 92%;
-        max-width: 700px;
-        outline: none;
-        box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
-      }
+    #searchBar:focus {
+      width: 92%;
+      max-width: 700px;
+      outline: none;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+    }
 
-      #gameList {
-        padding: 1rem;
-      }
+    .gameSection {
+      margin-bottom: 2rem;
+    }
 
-      .gameSection {
-        margin-bottom: 2rem;
-      }
+    .gameSection h2 {
+      margin: 1rem 0;
+      text-align: center;
+      font-size: 1.3rem;
+      color: var(--text);
+    }
 
-      .gameSection h2 {
-        margin: 1rem 0;
-        text-align: center;
-        font-size: 1.3rem;
-        color: var(--text);
-      }
+    .gameGrid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+    }
 
-      .gameGrid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 1.5rem;
-      }
+    .gameCard {
+      background-color: var(--card);
+      border-radius: 15px;
+      width: 220px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
 
-      .gameCard {
-        background-color: var(--card);
-        border-radius: 15px;
-        width: 220px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        cursor: pointer;
-        position: relative;
-      }
+    .gameCard:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+    }
 
-      .gameCard:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
-      }
+    .gameCard img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+    }
 
-      .gameCard img {
-        width: 100%;
-        height: 130px;
-        object-fit: cover;
-      }
+    .gameCard h3 {
+      margin: 0.5rem;
+      font-size: 1rem;
+      color: var(--text);
+    }
 
-      .gameCard h3 {
-        margin: 0.5rem;
-        font-size: 1rem;
-        color: var(--text);
-      }
+    #gameFrameContainer {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
 
-      .fav-heart {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 2rem;
-        color: #f00;
-        user-select: none;
-        transition: transform 0.3s ease, color 0.3s ease;
-      }
+    #gameFrame {
+      width: 100%;
+      height: 100vh;
+      border: none;
+    }
 
-      .fav-heart:hover {
-        transform: scale(1.5);
-        color: #b0b0b0;
-      }
+    #backButton {
+      background-color: black;
+      border: none;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
 
-      .fav-heart.not-fav {
-        color: #b0b0b0;
-      }
+    #backButton:hover {
+      background-color: #000;
+      transform: scale(1.1);
+    }
 
-      .fav-heart.not-fav:hover {
-        color: #ff6666;
-      }
+    #noResults {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.2rem;
+      display: none;
+    }
 
-      .remove-recent {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        padding: 5px 10px;
-        font-size: 0.8rem;
-        border: none;
-        background: #000000;
-        color: white;
-        border-radius: 5px;
-        cursor: pointer;
-      }
+    @media (max-width: 600px) {
+      #gameFrame { height: 80vh; }
+    }
+  </style>
+</head>
+<body>
+  <header id="banner">The banner is loading</header>
+  <input type="text" id="searchBar" placeholder="🔍 Search games..." />
+  <div id="gameList"></div>
 
-      #gameFrameContainer {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        padding: 0;
-        flex: 1;
-      }
+  <div id="noResults">
+    🚫 No games were found. Request games here:
+    <p>
+      <a href="https://forms.gle/ug1DLTusLaEeQV34A" target="_blank" style="color: #4ea5ff; text-decoration: underline;">Submit a Game</a>. 
+      Wanna play <strong>Granny</strong>? 
+      <a href="https://oldhag.cabralandy76.workers.dev/" target="_blank" style="color: #880808; text-decoration: underline;">Click me</a>.
+    </p>
+  </div>
 
-      #gameFrame {
-        width: 100%;
-        height: 100vh;
-        border: none;
-      }
+  <div id="gameFrameContainer">
+    <iframe id="gameFrame"></iframe>
+    <button id="backButton">↩ Go back</button>
+  </div>
 
-      #backButton {
-        background-color: black;
-        border: none;
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        font-weight: bold;
-        color: white;
-        border-radius: 10px;
-        cursor: pointer;
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        z-index: 10;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-      }
+  <script>
+    const bannerEl = document.getElementById("banner");
+    const gameListEl = document.getElementById("gameList");
+    const searchBar = document.getElementById("searchBar");
+    const noResultsEl = document.getElementById("noResults");
+    const gameFrameContainer = document.getElementById("gameFrameContainer");
+    const gameFrame = document.getElementById("gameFrame");
+    const backButton = document.getElementById("backButton");
 
-      #backButton:hover {
-        background-color: #000;
-        transform: scale(1.1);
-      }
-
-      #overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.7);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      }
-
-      #overlayContent {
-        background-color: var(--card);
-        padding: 2rem;
-        border-radius: 15px;
-        text-align: center;
-        color: var(--text);
-      }
-
-      #yesButton,
-      #noButton {
-        border: none;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-        font-weight: bold;
-        border-radius: 10px;
-        cursor: pointer;
-        margin: 0 0.5rem;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-      }
-
-      #yesButton {
-        background-color: #28a745;
-        color: white;
-      }
-
-      #yesButton:hover {
-        background-color: #218838;
-        transform: scale(1.1);
-      }
-
-      #noButton {
-        background-color: #dc3545;
-        color: white;
-      }
-
-      #noButton:hover {
-        background-color: #c82333;
-        transform: scale(1.1);
-      }
-
-      #noResults {
-        text-align: center;
-        color: var(--text-muted);
-        font-size: 1.2rem;
-        display: none;
-      }
-
-      @media (max-width: 600px) {
-        #gameFrame {
-          height: 80vh;
+    function typeText(element, text, speed = 70) {
+      let i = 0;
+      element.textContent = "";
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i++);
+          setTimeout(type, speed);
         }
       }
-    </style>
-  </head>
-  <body>
-    <header id="banner">The banner is loading</header>
-    <input type="text" id="searchBar" placeholder="🔍 Search games..." />
-    <div id="gameList">
-      <div class="gameSection">
-        <h2>❤️ Your Favorites</h2>
-        <div class="gameGrid" id="favoritesSection"></div>
-      </div>
-      <div class="gameSection">
-        <h2>🕓 Your Recently Played Games</h2>
-        <div class="gameGrid" id="recentSection"></div>
-      </div>
-      <div class="gameSection">
-        <h2>Games:</h2>
-        <div class="gameGrid" id="otherGamesSection"></div>
-      </div>
-    </div>
-    <div id="noResults">
-  🚫 No games were found. Request games here:
- <p>
-   <strong></strong>
-  <a href="https://forms.gle/ug1DLTusLaEeQV34A" target="_blank" style="color: #4ea5ff; text-decoration: underline;">Submit a Game here</a>. 
-  If you wanna play <strong>Granny</strong>, 
-  <a href="https://oldhag.cabralandy76.workers.dev/" target="_blank" style="color: #880808; text-decoration: underline;">click me</a>.
-</p>
+      type();
+    }
 
-  </a>
-</div>
-
-    <div id="gameFrameContainer">
-      <iframe id="gameFrame"></iframe>
-      <button id="backButton">↩ Go back</button>
-    </div>
-
-    <div id="overlay">
-      <div id="overlayContent">
-        <h2>Do you want to resume your last game?</h2>
-        <button id="yesButton">Yes</button>
-        <button id="noButton">No</button>
-      </div>
-    </div>
-
-    <script>
-      const bannerEl = document.getElementById("banner");
-      const gameListEl = document.getElementById("gameList");
-      const searchBar = document.getElementById("searchBar");
-      const favoritesSection = document.getElementById("favoritesSection");
-      const recentSection = document.getElementById("recentSection");
-      const otherGamesSection = document.getElementById("otherGamesSection");
-      const noResultsEl = document.getElementById("noResults");
-      const gameFrameContainer = document.getElementById("gameFrameContainer");
-      const gameFrame = document.getElementById("gameFrame");
-      const backButton = document.getElementById("backButton");
-      const overlay = document.getElementById("overlay");
-      const yesButton = document.getElementById("yesButton");
-      const noButton = document.getElementById("noButton");
-
-      function typeText(element, text, speed = 70) {
-        let i = 0;
-        element.textContent = "";
-        function type() {
-          if (i < text.length) {
-            element.textContent += text.charAt(i++);
-            setTimeout(type, speed);
-          }
-        }
-        type();
-      }
-
-      fetch("https://raw.githubusercontent.com/code-andrewy/cooltext/refs/heads/main/Text2")
-        .then((r) => r.text())
-        .then((data) => {
-          const lines = data.split("\n").filter(Boolean);
-          typeText(bannerEl, lines[Math.floor(Math.random() * lines.length)]);
-        });
-
-      let games = [];
-
-      fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt")
-        .then((r) => r.text())
-        .then((data) => {
-          const entries = data.split("Website url:").slice(1);
-          games = entries
-            .map((entry) => {
-              const [url, name, image] = entry.split(/Game name:|Image url:/).map((x) => x.trim());
-              return { url, name, imageUrl: image };
-            })
-            .filter((g) => g.url && g.name && g.imageUrl);
-          displayGames(games);
-          askToOpenLastGame();
-        });
-
-      function displayGames(list) {
-        favoritesSection.innerHTML = "";
-        recentSection.innerHTML = "";
-        otherGamesSection.innerHTML = "";
-
-        const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-        const recent = JSON.parse(localStorage.getItem("recent") || "[]");
-
-        const favorites = list.filter((g) => favs.includes(g.url));
-        const recentGames = list.filter((g) => recent.includes(g.url));
-        const others = list.filter((g) => !favs.includes(g.url) && !recent.includes(g.url));
-
-        favoritesSection.parentElement.style.display = favorites.length ? "block" : "none";
-        recentSection.parentElement.style.display = recentGames.length ? "block" : "none";
-
-        favorites.forEach((game) => {
-          favoritesSection.appendChild(createGameCard(game, true));
-        });
-        recentGames.forEach((game) => {
-          recentSection.appendChild(createGameCard(game, false, true));
-        });
-        others.forEach((game) => {
-          otherGamesSection.appendChild(createGameCard(game, false));
-        });
-
-        noResultsEl.style.display = list.length === 0 ? "block" : "none";
-      }
-
-      function createGameCard(game, isFav, isRecent = false) {
-        const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-        const card = document.createElement("div");
-        card.className = "gameCard";
-        card.innerHTML = `
-          <img src="${game.imageUrl}" alt="${game.name}">
-          <h3>${game.name}</h3>
-          <div class="fav-heart ${favs.includes(game.url) ? "" : "not-fav"}">♡</div>
-          ${isRecent ? '<button class="remove-recent">Remove</button>' : ""}
-        `;
-
-        card.querySelector(".fav-heart").addEventListener("click", (e) => {
-          e.stopPropagation();
-          toggleFavorite(game.url);
-          displayGames(games);
-        });
-
-        if (isRecent) {
-          card.querySelector(".remove-recent").addEventListener("click", (e) => {
-            e.stopPropagation();
-            let recent = JSON.parse(localStorage.getItem("recent") || "[]");
-            recent = recent.filter((url) => url !== game.url);
-            localStorage.setItem("recent", JSON.stringify(recent));
-            displayGames(games);
-          });
-        }
-
-        card.addEventListener("click", () => {
-          gameFrame.src = game.url;
-          gameFrameContainer.style.display = "flex";
-          gameListEl.style.display = "none";
-          searchBar.style.display = "none";
-          bannerEl.style.display = "none";
-          localStorage.setItem("lastGame", game.url);
-
-          let recent = JSON.parse(localStorage.getItem("recent") || "[]");
-          recent = [game.url, ...recent.filter((url) => url !== game.url)].slice(0, 7);
-          localStorage.setItem("recent", JSON.stringify(recent));
-        });
-
-        return card;
-      }
-
-      function toggleFavorite(url) {
-        let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-        favs = favs.includes(url) ? favs.filter((u) => u !== url) : [...favs, url];
-        localStorage.setItem("favorites", JSON.stringify(favs));
-      }
-
-      function askToOpenLastGame() {
-        const last = localStorage.getItem("lastGame");
-        const match = games.find((g) => g.url === last);
-        if (match) {
-          document.querySelector("#overlayContent h2").textContent = `Would you resume ${match.name}?`;
-          overlay.style.display = "flex";
-          yesButton.onclick = () => {
-            gameFrame.src = match.url;
-            gameFrameContainer.style.display = "flex";
-            gameListEl.style.display = "none";
-            searchBar.style.display = "none";
-            bannerEl.style.display = "none";
-            overlay.style.display = "none";
-          };
-          noButton.onclick = () => {
-            overlay.style.display = "none";
-          };
-        }
-      }
-
-      searchBar.addEventListener("input", () => {
-        const q = searchBar.value.toLowerCase();
-        const filtered = games.filter((g) => g.name.toLowerCase().includes(q));
-        displayGames(filtered);
+    fetch("https://raw.githubusercontent.com/code-andrewy/cooltext/refs/heads/main/Text2")
+      .then(r => r.text())
+      .then(data => {
+        const lines = data.split("\n").filter(Boolean);
+        typeText(bannerEl, lines[Math.floor(Math.random() * lines.length)]);
       });
 
-      backButton.addEventListener("click", () => {
-        gameFrame.src = "";
-        gameFrameContainer.style.display = "none";
-        gameListEl.style.display = "block";
-        searchBar.style.display = "block";
-        bannerEl.style.display = "block";
+    let games = [];
+
+    fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt")
+      .then(r => r.text())
+      .then(data => {
+        const entries = data.split("Website url:").slice(1);
+        games = entries.map(entry => {
+          const [url, name, image, category] = entry.split(/Game name:|Image url:|Category:/).map(x => x.trim());
+          return { url, name, imageUrl: image, category };
+        }).filter(g => g.url && g.name && g.imageUrl && g.category);
+        displayGames(games);
       });
-    </script>
-  </body>
+
+    function displayGames(list) {
+      gameListEl.innerHTML = "";
+      const grouped = {};
+
+      list.forEach(game => {
+        const category = game.category || "Other";
+        if (!grouped[category]) grouped[category] = [];
+        grouped[category].push(game);
+      });
+
+      Object.entries(grouped).forEach(([category, games]) => {
+        const section = document.createElement("div");
+        section.className = "gameSection";
+        section.innerHTML = `<h2>${category}</h2><div class="gameGrid"></div>`;
+        const grid = section.querySelector(".gameGrid");
+
+        games.forEach(game => {
+          grid.appendChild(createGameCard(game));
+        });
+
+        gameListEl.appendChild(section);
+      });
+
+      noResultsEl.style.display = list.length === 0 ? "block" : "none";
+    }
+
+    function createGameCard(game) {
+      const card = document.createElement("div");
+      card.className = "gameCard";
+      card.innerHTML = `
+        <img src="${game.imageUrl}" alt="${game.name}">
+        <h3>${game.name}</h3>
+      `;
+
+      card.addEventListener("click", () => {
+        gameFrame.src = game.url;
+        gameFrameContainer.style.display = "flex";
+        gameListEl.style.display = "none";
+        searchBar.style.display = "none";
+        bannerEl.style.display = "none";
+        localStorage.setItem("lastGame", game.url);
+      });
+
+      return card;
+    }
+
+    searchBar.addEventListener("input", () => {
+      const q = searchBar.value.toLowerCase();
+      const filtered = games.filter(g => g.name.toLowerCase().includes(q));
+      displayGames(filtered);
+    });
+
+    backButton.addEventListener("click", () => {
+      gameFrame.src = "";
+      gameFrameContainer.style.display = "none";
+      gameListEl.style.display = "block";
+      searchBar.style.display = "block";
+      bannerEl.style.display = "block";
+    });
+  </script>
+</body>
 </html>
