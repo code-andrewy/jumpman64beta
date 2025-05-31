@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hotspot Notice</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #121212;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .centered {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 20px;
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background-color: #1e90ff;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1em;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.3s ease;
+      animation: bounceIn 1s ease;
+    }
+
+    button:hover {
+      background-color: #0f7ae5;
+      transform: scale(1.05);
+    }
+
+    #embedSection {
+      display: none;
+      height: 100%;
+      width: 100%;
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes bounceIn {
+      0%   { transform: scale(0.9); }
+      50%  { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="centered" id="message">
+    <h1>Hey!<br>You need to use your phone's hotspot for this to work :)</h1>
+    <button id="continueButton">Got it</button>
+  </div>
+
+  <div id="embedSection">
+    <iframe src="https://sz-games.github.io/roblox.html"></iframe>
+  </div>
+
+  <script>
+    document.getElementById("continueButton").onclick = function () {
+      document.getElementById("message").style.display = "none";
+      document.getElementById("embedSection").style.display = "block";
+    };
+  </script>
+</body>
+</html>
