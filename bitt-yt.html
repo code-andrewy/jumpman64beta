@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    header {
+      width: 100%;
+      background-color: #ff3333;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      color: white;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .logo {
+      color: white;
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .search-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-top: 30px;
+      width: 90%;
+      max-width: 1200px;
+    }
+
+    #searchQuery {
+      padding: 12px 18px;
+      font-size: 1.2rem;
+      background-color: #fff;
+      border: 2px solid #ddd;
+      border-radius: 40px;
+      width: 70%;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      outline: none;
+    }
+
+    #searchQuery:focus {
+      border-color: #ff3333;
+      box-shadow: 0 0 8px rgba(255, 51, 51, 0.5);
+    }
+
+    /* Refined button styles */
+    .btn {
+      padding: 12px 24px;
+      background: linear-gradient(145deg, #ff4d4d, #ff3333);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 700;
+      box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.15), -4px -4px 10px rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn:hover {
+      background: linear-gradient(145deg, #ff3333, #cc2929);
+      transform: scale(1.05);
+      box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.2), -8px -8px 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn:active {
+      background: #cc2929;
+      box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.1), inset -4px -4px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .btn:focus {
+      outline: none;
+    }
+
+    .btn span {
+      margin-left: 10px;
+    }
+
+    #searchResults {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+      padding: 0 20px;
+      width: 90%;
+      max-width: 1200px;
+      justify-content: center;
+    }
+
+    .video-item {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .video-item:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
+    }
+
+    .video-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+
+    .video-item img:hover {
+      transform: scale(1.05);
+    }
+
+    .video-item h3 {
+      font-size: 1.2rem;
+      color: #333;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    .video-item p {
+      font-size: 0.95rem;
+      color: #555;
+      margin-top: 8px;
+    }
+
+    .likes-count,
+    .channel-name,
+    .subscribers-count {
+      font-size: 1rem;
+      color: #777;
+      opacity: 0; /* Initially hidden */
+      transition: opacity 0.3s ease;
+      visibility: hidden;
+      display: block;
+      margin-top: 10px;
+    }
+
+    .video-item:hover .likes-count,
+    .video-item:hover .channel-name,
+    .video-item:hover .subscribers-count {
+      opacity: 1;
+      visibility: visible; /* Show details when hovered */
+    }
+
+    .play-button {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .video-item:hover .play-button {
+      opacity: 1;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    #videoContainer {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      background-color: #000;
+      border-radius: 0;
+    }
+
+    #videoFrame {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+    }
+
+    #closeButton {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: #ff3333;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      cursor: pointer;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      transition: all 0.3s ease;
+    }
+
+    #closeButton:hover {
+      background-color: #cc2929;
+      transform: scale(1.1);
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 10px 20px;
+      }
+
+      .search-container {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      #searchQuery {
+        width: 90%;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      #searchResults {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #searchQuery {
+        font-size: 1rem;
+      }
+
+      .btn {
+        font-size: 1rem;
+      }
+
+      #searchResults {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header with YouTube-like logo -->
+  <header>
+    <div class="logo">YouTube</div>
+    <h1></h1>
+  </header>
+
+  <!-- Search Section -->
+  <div class="search-container">
+    <input type="text" id="searchQuery" placeholder="Search for videos...">
+    <button class="btn" id="searchBtn">
+      Search <span>🔍</span>
+    </button>
+  </div>
+
+  <!-- Search Results Section -->
+  <div id="searchResults"></div>
+
+  <!-- Load More Button -->
+  <button class="btn" id="loadMoreBtn" style="display:none;">
+    Load More <span>🔽</span>
+  </button>
+
+  <!-- Video Overlay Section -->
+  <div id="overlay">
+    <div id="videoContainer">
+      <button id="closeButton">✖</button>
+      <iframe id="videoFrame" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script>
+    let apiKey = "AIzaSyClo8uvH1xBVG1ES2PP2pyLZlvUeHh-DpU";
+    let nextPageToken = null;
+
+    $(document).ready(function () {
+      // Trigger search on button click
+      $("#searchBtn").on("click", function () {
+        let query = $("#searchQuery").val().trim();
+        if (query) {
+          searchVideos(query);
+        }
+      });
+
+      // Trigger search when 'Enter' key is pressed
+      $("#searchQuery").on("keypress", function (e) {
+        if (e.which === 13) {  // 'Enter' key
+          let query = $("#searchQuery").val().trim();
+          if (query) {
+            searchVideos(query);
+          }
+        }
+      });
+
+      // Load more videos when button is clicked
+      $("#loadMoreBtn").on("click", function () {
+        let query = $("#searchQuery").val().trim();
+        if (query && nextPageToken) {
+          loadMoreVideos(query, nextPageToken);
+        }
+      });
+
+      // Close the video overlay
+      $("#closeButton").on("click", function () {
+        $("#videoFrame").attr("src", "");
+        $("#overlay").fadeOut();
+      });
+    });
+
+    function searchVideos(query) {
+      $.get("https://www.googleapis.com/youtube/v3/search", {
+        part: "snippet",
+        q: query,
+        type: "video",
+        maxResults: 10,
+        key: apiKey,
+        relevanceLanguage: 'en'
+      }, function (data) {
+        let html = "";
+        let videosFetched = 0;
+
+        nextPageToken = data.nextPageToken;  // Save the next page token
+
+        data.items.forEach(function (item) {
+          let videoId = item.id.videoId;
+          let title = item.snippet.title;
+          let thumbnailUrl = item.snippet.thumbnails.medium.url;
+          let channelId = item.snippet.channelId;
+          let channelName = item.snippet.channelTitle;
+
+          // Get channel details (subscriber count)
+          getChannelDetails(channelId, function(subscribers) {
+            videosFetched++;
+
+            // Format likes and subscribers count
+            let likes = Math.floor(Math.random() * 100000); // Random like count for demonstration
+            let formattedLikes = formatLikes(likes);
+            let formattedSubscribers = formatSubscribers(subscribers);
+
+            html += `<div class='video-item'>
+                       <img src='${thumbnailUrl}' alt='${title}'>
+                       <button class="play-button" onclick="playVideo('${videoId}')">Play</button>
+                       <h3>${title}</h3>
+                       <p class="likes-count">${formattedLikes} Likes</p>
+                       <p class="channel-name">${channelName}</p>
+                       <p class="subscribers-count">${formattedSubscribers} Subscribers</p>
+                     </div>`;
+
+            if (videosFetched === data.items.length) {
+              $("#searchResults").html(html);
+              $("#loadMoreBtn").show();  // Show the Load More button
+            }
+          });
+        });
+      });
+    }
+
+    function loadMoreVideos(query, pageToken) {
+      $.get("https://www.googleapis.com/youtube/v3/search", {
+        part: "snippet",
+        q: query,
+        type: "video",
+        maxResults: 10,
+        key: apiKey,
+        pageToken: pageToken,
+        relevanceLanguage: 'en'
+      }, function (data) {
+        let html = "";
+        let videosFetched = 0;
+
+        nextPageToken = data.nextPageToken;  // Save the next page token
+
+        data.items.forEach(function (item) {
+          let videoId = item.id.videoId;
+          let title = item.snippet.title;
+          let thumbnailUrl = item.snippet.thumbnails.medium.url;
+          let channelId = item.snippet.channelId;
+          let channelName = item.snippet.channelTitle;
+
+          // Get channel details (subscriber count)
+          getChannelDetails(channelId, function(subscribers) {
+            videosFetched++;
+
+            // Format likes and subscribers count
+            let likes = Math.floor(Math.random() * 100000); // Random like count for demonstration
+            let formattedLikes = formatLikes(likes);
+            let formattedSubscribers = formatSubscribers(subscribers);
+
+            html += `<div class='video-item'>
+                       <img src='${thumbnailUrl}' alt='${title}'>
+                       <button class="play-button" onclick="playVideo('${videoId}')">Play</button>
+                       <h3>${title}</h3>
+                       <p class="likes-count">${formattedLikes} Likes</p>
+                       <p class="channel-name">${channelName}</p>
+                       <p class="subscribers-count">${formattedSubscribers} Subscribers</p>
+                     </div>`;
+
+            if (videosFetched === data.items.length) {
+              $("#searchResults").append(html); // Append the new results
+            }
+          });
+        });
+      });
+    }
+
+    function formatLikes(likes) {
+      if (likes >= 1000000) {
+        return (likes / 1000000).toFixed(1) + "M";
+      } else if (likes >= 1000) {
+        return (likes / 1000).toFixed(1) + "k";
+      } else {
+        return likes;
+      }
+    }
+
+    function formatSubscribers(subscribers) {
+      if (subscribers >= 1000000) {
+        return (subscribers / 1000000).toFixed(1) + "M";
+      } else if (subscribers >= 1000) {
+        return (subscribers / 1000).toFixed(1) + "k";
+      } else {
+        return subscribers;
+      }
+    }
+
+    function getChannelDetails(channelId, callback) {
+      $.get("https://www.googleapis.com/youtube/v3/channels", {
+        part: "statistics",
+        id: channelId,
+        key: apiKey
+      }, function (data) {
+        let subscribers = data.items[0].statistics.subscriberCount;
+        callback(subscribers);
+      });
+    }
+
+    function playVideo(videoId) {
+      $("#videoFrame").attr("src", `https://www.youtube.com/embed/${videoId}`);
+      $("#overlay").fadeIn();
+    }
+  </script>
+</body>
+</html>
