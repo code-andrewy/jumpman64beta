@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Game Embedder</title>
+  <title>Simple Embed</title>
   <style>
     body, html {
       margin: 0;
@@ -16,23 +16,16 @@
   </style>
 </head>
 <body>
-  <iframe id="gameFrame" src=""></iframe>
+  <iframe id="gameFrame"></iframe>
 
   <script>
-    // Function to get query parameters
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
+    const params = new URLSearchParams(window.location.search);
+    const gameURL = params.get("game");
 
-    // Get the 'game' parameter from the URL
-    const gameURL = getQueryParam('game');
-
-    // If a game URL is provided, set it as the iframe source
     if (gameURL) {
-      document.getElementById('gameFrame').src = gameURL;
+      document.getElementById("gameFrame").src = gameURL;
     } else {
-      document.body.innerHTML = '<h2 style="text-align:center;">No game URL provided.</h2>';
+      document.body.innerHTML = "<h2 style='text-align:center;'>No game URL provided.</h2>";
     }
   </script>
 </body>
