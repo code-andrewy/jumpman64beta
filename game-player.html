@@ -143,7 +143,7 @@
     }
 
     function addImagesToLoader(imageUrls) {
-      const selected = getRandom(imageUrls, Math.floor(Math.random() * 3) + 3);
+     const selected = getRandom(imageUrls, Math.floor(Math.random() * 4) + 5);
       selected.forEach(url => {
         const img = document.createElement("img");
         img.src = url;
