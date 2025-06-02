@@ -64,7 +64,7 @@
     const loader = document.getElementById("loader");
     const preview = document.getElementById("preview");
 
-    // Function to fetch and parse game data
+    // Fetch and parse game data
     async function fetchGameData() {
       try {
         const response = await fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt");
@@ -77,17 +77,15 @@
       }
     }
 
-    // Function to parse the raw text into game objects
+    // Parse games from raw text
     function parseGameData(text) {
-      const lines = text.split("Website url:");
+      const chunks = text.split("Website url:").slice(1);
       const games = [];
 
-      lines.forEach(line => {
-        if (line.trim() === "") return;
-
-        const urlMatch = line.match(/(https?:\/\/[^\s]+)/);
-        const nameMatch = line.match(/Game name:\s*(.+?)(?=Image url:|$)/);
-        const imageMatch = line.match(/Image url:\s*(https?:\/\/[^\s]+)/);
+      chunks.forEach(chunk => {
+        const urlMatch = chunk.match(/(https?:\/\/[^\s]+)/);
+        const nameMatch = chunk.match(/Game name:\s*(.+?)(?=Image url:|$)/);
+        const imageMatch = chunk.match(/Image url:\s*(https?:\/\/[^\s]+)/);
 
         if (urlMatch && nameMatch && imageMatch) {
           games.push({
@@ -101,17 +99,18 @@
       return games;
     }
 
-    // Function to select a random game image
-    function selectRandomImage(games) {
-      if (games.length === 0) return;
-      const randomGame = games[Math.floor(Math.random() * games.length)];
-      preview.src = randomGame.image;
+    // Only use games 5–8 (index 4 to 7)
+    function selectImageFromSubset(games) {
+      const subset = games.slice(4, 8); // JS is 0-indexed
+      if (subset.length > 0) {
+        const random = subset[Math.floor(Math.random() * subset.length)];
+        preview.src = random.image;
+      }
     }
 
-    // Main function to initialize the page
     async function init() {
       const games = await fetchGameData();
-      selectRandomImage(games);
+      selectImageFromSubset(games);
 
       if (gameURL) {
         gameFrame.src = gameURL;
@@ -127,7 +126,6 @@
       }
     }
 
-    // Initialize the page
     init();
   </script>
 
