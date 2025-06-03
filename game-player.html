@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title id="pageTitle">Loading Game...</title>
+  <title>Game Page</title>
   <style>
     body {
       margin: 0;
@@ -26,28 +26,15 @@
       align-items: center;
       gap: 1rem;
       z-index: 10;
-      max-width: 90%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      transition: background-color 0.3s ease;
     }
 
     #topBar:hover {
       background-color: rgba(0, 0, 0, 0.95);
     }
 
-    #gameName {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #ffffff;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
     #timeDisplay {
-      font-size: 1rem;
-      color: #bbbbbb;
+      font-size: 1.2rem;
+      color: #ffffff;
     }
 
     #militaryToggle {
@@ -63,22 +50,11 @@
       left: 0;
       z-index: 1;
     }
-
-    #loadingMessage {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: #888;
-      font-size: 1.5rem;
-      z-index: 5;
-    }
   </style>
 </head>
 <body>
 
   <div id="topBar">
-    <div id="gameName">Loading...</div>
     <div id="timeDisplay">--:--:--</div>
     <label id="militaryToggle">
       <input type="checkbox" id="toggleMilitary" />
@@ -86,21 +62,15 @@
     </label>
   </div>
 
-  <div id="loadingMessage">Loading game...</div>
   <iframe id="gameFrame" loading="lazy"></iframe>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const gameURL = params.get("game");
-    const overrideName = params.get("name");
-
-    const gameNameEl = document.getElementById("gameName");
-    const pageTitleEl = document.getElementById("pageTitle");
-    const iframeEl = document.getElementById("gameFrame");
-    const loadingMessageEl = document.getElementById("loadingMessage");
 
     const timeDisplay = document.getElementById("timeDisplay");
     const toggleMilitary = document.getElementById("toggleMilitary");
+    const iframeEl = document.getElementById("gameFrame");
 
     // Time display logic
     function updateTime() {
@@ -126,107 +96,9 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    function setGameTitle(name) {
-      gameNameEl.textContent = name;
-      pageTitleEl.textContent = name;
-    }
-
-    function formatDomainName(url) {
-      try {
-        const hostname = new URL(url).hostname.replace("www.", "");
-        const parts = hostname.split(".");
-        const domain = parts.length > 2 ? parts[parts.length - 2] : parts[0];
-        return domain.charAt(0).toUpperCase() + domain.slice(1);
-      } catch {
-        return "Unknown Game";
-      }
-    }
-
-    function normalizeUrl(url) {
-      try {
-        let u = new URL(url);
-        // Remove trailing slash for comparison
-        if (u.pathname.endsWith('/')) {
-          u.pathname = u.pathname.slice(0, -1);
-        }
-        // Lowercase hostname for consistent comparison
-        u.hostname = u.hostname.toLowerCase();
-        return u.toString();
-      } catch {
-        return url.trim();
-      }
-    }
-
-    function fetchGameNameFromList(gameURL) {
-      const normGameURL = normalizeUrl(gameURL);
-      return fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt")
-        .then(res => res.text())
-        .then(data => {
-          const entries = data.split("Website url:");
-          for (const entry of entries) {
-            const trimmed = entry.trim();
-            if (!trimmed) continue;
-
-            const lines = trimmed.split("\n").map(line => line.trim());
-            const urlLineRaw = lines[0];
-            const nameLine = lines.find(line => line.startsWith("Game name:"));
-
-            if (!nameLine) continue;
-
-            const urlLine = normalizeUrl(urlLineRaw);
-
-            // Compare URLs allowing partial match in either direction
-            if (normGameURL.startsWith(urlLine) || urlLine.startsWith(normGameURL)) {
-              return nameLine.replace("Game name:", "").trim();
-            }
-          }
-          return null;
-        });
-    }
-
-    // Try to get iframe title if same-origin
-    function tryGetIframeTitle() {
-      try {
-        const iframeDoc = iframeEl.contentDocument || iframeEl.contentWindow.document;
-        const title = iframeDoc.title;
-        if (title && title.trim().length > 0) {
-          return title.trim();
-        }
-      } catch {
-        // Cross-origin access blocked
-      }
-      return null;
-    }
-
-    function updateGameTitle() {
-      const iframeTitle = tryGetIframeTitle();
-      if (iframeTitle) {
-        setGameTitle(iframeTitle);
-      } else if (overrideName) {
-        setGameTitle(overrideName);
-      } else {
-        fetchGameNameFromList(gameURL)
-          .then(name => {
-            setGameTitle(name || formatDomainName(gameURL));
-          })
-          .catch(() => {
-            setGameTitle(formatDomainName(gameURL));
-          });
-      }
-    }
-
+    // Load game iframe if provided
     if (gameURL) {
       iframeEl.src = gameURL;
-      loadingMessageEl.style.display = "block";
-
-      iframeEl.onload = () => {
-        loadingMessageEl.style.display = "none";
-        updateGameTitle();
-      };
-
-    } else {
-      setGameTitle("No Game URL");
-      loadingMessageEl.textContent = "No game was specified in the URL.";
     }
   </script>
 </body>
