@@ -12,7 +12,6 @@
       font-family: "Segoe UI", sans-serif;
       height: 100vh;
       overflow: hidden;
-      position: relative;
     }
 
     #topBar {
@@ -64,6 +63,16 @@
       left: 0;
       z-index: 1;
     }
+
+    #loadingMessage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #888;
+      font-size: 1.5rem;
+      z-index: 5;
+    }
   </style>
 </head>
 <body>
@@ -77,104 +86,125 @@
     </label>
   </div>
 
-  <iframe id="gameFrame"></iframe>
+  <div id="loadingMessage">Loading game...</div>
+  <iframe id="gameFrame" loading="lazy"></iframe>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const gameURL = params.get("game");
     const overrideName = params.get("name");
 
-    const gameNameElement = document.getElementById("gameName");
-    const pageTitleElement = document.getElementById("pageTitle");
-    const iframeElement = document.getElementById("gameFrame");
+    const gameNameEl = document.getElementById("gameName");
+    const pageTitleEl = document.getElementById("pageTitle");
+    const iframeEl = document.getElementById("gameFrame");
+    const loadingMessageEl = document.getElementById("loadingMessage");
 
     const timeDisplay = document.getElementById("timeDisplay");
     const toggleMilitary = document.getElementById("toggleMilitary");
 
+    // Time display logic
     function updateTime() {
       const now = new Date();
       let hours = now.getHours();
       const minutes = now.getMinutes().toString().padStart(2, "0");
       const seconds = now.getSeconds().toString().padStart(2, "0");
 
-      let timeString;
-      if (toggleMilitary.checked) {
-        timeString = `${hours.toString().padStart(2, "0")}:${minutes}:${seconds}`;
-      } else {
-        const ampm = hours >= 12 ? "PM" : "AM";
-        hours = hours % 12 || 12;
-        timeString = `${hours}:${minutes}:${seconds} ${ampm}`;
-      }
+      const timeStr = toggleMilitary.checked
+        ? `${hours.toString().padStart(2, "0")}:${minutes}:${seconds}`
+        : `${(hours % 12 || 12)}:${minutes}:${seconds} ${hours >= 12 ? "PM" : "AM"}`;
 
-      timeDisplay.textContent = timeString;
+      timeDisplay.textContent = timeStr;
     }
 
-    // Load military time setting from localStorage
-    const savedMilitary = localStorage.getItem("militaryTime");
-    if (savedMilitary !== null) {
-      toggleMilitary.checked = savedMilitary === "true";
-    }
-    updateTime();
-
-    // Save setting when checkbox changes
+    // Load saved 24h preference
+    toggleMilitary.checked = localStorage.getItem("militaryTime") === "true";
     toggleMilitary.addEventListener("change", () => {
       localStorage.setItem("militaryTime", toggleMilitary.checked);
       updateTime();
     });
 
     setInterval(updateTime, 1000);
+    updateTime();
+
+    function setGameTitle(name) {
+      gameNameEl.textContent = name;
+      pageTitleEl.textContent = name;
+    }
 
     function formatDomainName(url) {
       try {
         const hostname = new URL(url).hostname.replace("www.", "");
         const parts = hostname.split(".");
-        const base = parts.length > 2 ? parts[parts.length - 2] : parts[0];
-        return base.charAt(0).toUpperCase() + base.slice(1);
+        const domain = parts.length > 2 ? parts[parts.length - 2] : parts[0];
+        return domain.charAt(0).toUpperCase() + domain.slice(1);
       } catch {
         return "Unknown Game";
       }
     }
 
-    function setGameTitle(name) {
-      gameNameElement.textContent = name;
-      pageTitleElement.textContent = name;
+    function fetchGameNameFromList(gameURL) {
+      return fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt")
+        .then(res => res.text())
+        .then(data => {
+          const entries = data.split("Website url:");
+          for (const entry of entries) {
+            const trimmed = entry.trim();
+            if (!trimmed.includes("Game name:")) continue;
+
+            const urlLine = trimmed.split("\n").find(line => line.trim().startsWith("https://"));
+            const nameLine = trimmed.split("\n").find(line => line.trim().startsWith("Game name:"));
+
+            if (urlLine && nameLine && urlLine.trim() === gameURL) {
+              return nameLine.replace("Game name:", "").trim();
+            }
+          }
+          return null;
+        });
     }
 
-    if (gameURL) {
-      iframeElement.src = gameURL;
+    // Try to get iframe title if same-origin
+    function tryGetIframeTitle() {
+      try {
+        const iframeDoc = iframeEl.contentDocument || iframeEl.contentWindow.document;
+        const title = iframeDoc.title;
+        if (title && title.trim().length > 0) {
+          return title.trim();
+        }
+      } catch {
+        // Cross-origin access blocked
+      }
+      return null;
+    }
 
-      if (overrideName) {
+    function updateGameTitle() {
+      const iframeTitle = tryGetIframeTitle();
+      if (iframeTitle) {
+        setGameTitle(iframeTitle);
+      } else if (overrideName) {
         setGameTitle(overrideName);
       } else {
-        fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt")
-          .then(res => res.text())
-          .then(data => {
-            const entries = data.split("Website url:");
-            let found = false;
-
-            for (const entry of entries) {
-              const lines = entry.trim().split("\n");
-              const urlLine = lines.find(line => line.startsWith("https://"));
-              const nameLine = lines.find(line => line.startsWith("Game name:"));
-
-              if (urlLine && nameLine && urlLine.trim() === gameURL) {
-                const gameName = nameLine.replace("Game name:", "").trim();
-                setGameTitle(gameName);
-                found = true;
-                break;
-              }
-            }
-
-            if (!found) {
-              setGameTitle(formatDomainName(gameURL));
-            }
+        fetchGameNameFromList(gameURL)
+          .then(name => {
+            setGameTitle(name || formatDomainName(gameURL));
           })
           .catch(() => {
             setGameTitle(formatDomainName(gameURL));
           });
       }
+    }
+
+    if (gameURL) {
+      iframeEl.src = gameURL;
+      loadingMessageEl.style.display = "block";
+
+      iframeEl.onload = () => {
+        loadingMessageEl.style.display = "none";
+        updateGameTitle();
+      };
+
     } else {
       setGameTitle("No Game URL");
+      loadingMessageEl.textContent = "No game was specified in the URL.";
     }
   </script>
 </body>
