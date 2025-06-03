@@ -149,12 +149,14 @@
           const entries = data.split("Website url:");
           for (const entry of entries) {
             const trimmed = entry.trim();
-            if (!trimmed.includes("Game name:")) continue;
+            if (!trimmed) continue;
 
-            const urlLine = trimmed.split("\n").find(line => line.trim().startsWith("https://"));
-            const nameLine = trimmed.split("\n").find(line => line.trim().startsWith("Game name:"));
+            // First line should be the URL
+            const lines = trimmed.split("\n").map(line => line.trim());
+            const urlLine = lines[0];
+            const nameLine = lines.find(line => line.startsWith("Game name:"));
 
-            if (urlLine && nameLine && urlLine.trim() === gameURL) {
+            if (urlLine === gameURL && nameLine) {
               return nameLine.replace("Game name:", "").trim();
             }
           }
