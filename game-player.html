@@ -142,7 +142,23 @@
       }
     }
 
+    function normalizeUrl(url) {
+      try {
+        let u = new URL(url);
+        // Remove trailing slash for comparison
+        if (u.pathname.endsWith('/')) {
+          u.pathname = u.pathname.slice(0, -1);
+        }
+        // Lowercase hostname for consistent comparison
+        u.hostname = u.hostname.toLowerCase();
+        return u.toString();
+      } catch {
+        return url.trim();
+      }
+    }
+
     function fetchGameNameFromList(gameURL) {
+      const normGameURL = normalizeUrl(gameURL);
       return fetch("https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/text.txt")
         .then(res => res.text())
         .then(data => {
@@ -151,12 +167,16 @@
             const trimmed = entry.trim();
             if (!trimmed) continue;
 
-            // First line should be the URL
             const lines = trimmed.split("\n").map(line => line.trim());
-            const urlLine = lines[0];
+            const urlLineRaw = lines[0];
             const nameLine = lines.find(line => line.startsWith("Game name:"));
 
-            if (urlLine === gameURL && nameLine) {
+            if (!nameLine) continue;
+
+            const urlLine = normalizeUrl(urlLineRaw);
+
+            // Compare URLs allowing partial match in either direction
+            if (normGameURL.startsWith(urlLine) || urlLine.startsWith(normGameURL)) {
               return nameLine.replace("Game name:", "").trim();
             }
           }
