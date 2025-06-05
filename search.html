@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chickenpass</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Varela+Round:wght@400&display=swap');
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background-color: black;
+      font-family: 'Varela Round', sans-serif;
+      color: #ADD8E6;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      animation: fadeIn 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .text {
+      font-size: 100px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      animation: slideDown 1s ease;
+    }
+    #clock {
+      font-size: 50px;
+      margin-bottom: 20px;
+      color: #00ffff;
+      font-weight: bold;
+    }
+    input#url {
+      font-size: 30px;
+      width: 600px;
+      height: 60px;
+      background-color: black;
+      color: #ADD8E6;
+      outline: 4px solid #ADD8E6;
+      border-radius: 15px;
+      margin-bottom: 10px;
+      padding: 10px;
+      animation: popIn 1.2s ease;
+      transition: width 0.3s ease-in-out, outline-color 0.3s ease-in-out;
+    }
+    input#url:hover,
+    input#url:focus {
+      width: 700px;
+      outline-color: #00ffff;
+    }
+    #search-area {
+      position: relative;
+    }
+    #suggestions {
+      list-style: none;
+      padding: 0;
+      margin-top: 0;
+      width: 600px;
+      text-align: left;
+      color: #ADD8E6;
+      background-color: #111;
+      border: 1px solid #ADD8E6;
+      border-radius: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      position: absolute;
+      z-index: 99;
+    }
+    #suggestions li {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    #suggestions li:hover {
+      background-color: #222;
+    }
+    button.redirect-button {
+      font-size: 30px;
+      background-color: green;
+      color: white;
+      border: none;
+      width: 200px;
+      height: 60px;
+      outline: 4px solid darkgreen;
+      border-radius: 15px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+    }
+    button.redirect-button:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+    .quick-links {
+      margin: 20px 0;
+    }
+    .quick-links button {
+      margin: 5px;
+      padding: 10px 20px;
+      font-size: 20px;
+      border-radius: 10px;
+      background-color: #222;
+      color: #ADD8E6;
+      border: 2px solid #ADD8E6;
+      cursor: pointer;
+      transition: background-color 0.3s ease-in-out;
+    }
+    .quick-links button:hover {
+      background-color: #444;
+    }
+    .bookmark-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin: 5px;
+    }
+    .bookmark-delete {
+      font-size: 16px;
+      color: red;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .bookmark-delete:hover {
+      color: #ff6666;
+    }
+    #recent-visits {
+      margin-top: 30px;
+    }
+    #recent-visits h2 {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+    #recent-visits button {
+      margin: 4px;
+      padding: 8px 15px;
+      font-size: 18px;
+      border-radius: 8px;
+      background-color: #111;
+      color: #ADD8E6;
+      border: 2px solid #00ffff;
+      cursor: pointer;
+    }
+    #recent-visits button:hover {
+      background-color: #00ffff;
+      color: black;
+    }
+    .new-image {
+      margin: 20px 0;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
+    .add-bookmark {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .add-bookmark input {
+      font-size: 20px;
+      width: 250px;
+      height: 50px;
+      background-color: black;
+      color: #ADD8E6;
+      outline: 3px solid #ADD8E6;
+      border-radius: 10px;
+      padding: 8px;
+    }
+    .add-bookmark input:hover,
+    .add-bookmark input:focus {
+      outline-color: #00ffff;
+    }
+    .add-bookmark button {
+      font-size: 20px;
+      background-color: #006400;
+      color: white;
+      border: none;
+      width: 150px;
+      height: 50px;
+      outline: 3px solid #004d00;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .add-bookmark-toggle {
+      font-size: 40px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #222;
+      color: #ADD8E6;
+      border: 3px solid #ADD8E6;
+      cursor: pointer;
+    }
+    .add-bookmark-toggle:hover {
+      background-color: #444;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="text">Chickenpass</div>
+    <div id="clock"></div>
+
+    <div id="search-area">
+      <input type="text" id="url" placeholder="Enter URL or Google Search" />
+      <ul id="suggestions"></ul>
+    </div>
+
+    <button class="redirect-button" onclick="redirect()">Launch</button>
+    <div class="quick-links" id="quick-links"></div>
+    <button class="add-bookmark-toggle" onclick="toggleBookmarkForm()">+</button>
+
+    <div class="add-bookmark" id="bookmark-form">
+      <input type="text" id="bookmark-name" placeholder="Bookmark Name" />
+      <input type="text" id="bookmark-url" placeholder="Bookmark URL (https://...)" />
+      <button onclick="addBookmark()">Add Bookmark</button>
+    </div>
+
+    <div id="recent-visits">
+      <h2>Recently Visited Sites</h2>
+      <div id="recent-links"></div>
+    </div>
+
+    <img class="new-image" src="https://media.istockphoto.com/id/1180812977/photo/cute-chick-king-or-queen-monarch-costumed-with-golden-crown.jpg?s=612x612&w=0&k=20&c=D3wWeb_5tvZeux9kCiRX3SYpGwFyHj90hd2TcgnMPUA=" alt="Chicken Image" />
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'chickenpass_bookmarks';
+    const RECENT_KEY = 'chickenpass_recent';
+    const MAX_RECENT = 5;
+    const inputField = document.getElementById('url');
+    const suggestionsList = document.getElementById('suggestions');
+    const quickLinksContainer = document.getElementById('quick-links');
+    const recentLinksContainer = document.getElementById('recent-links');
+
+    function redirect() {
+      const input = inputField.value.trim();
+      if (!input) return;
+      let url;
+      if (/^(https?:\/\/)?([\w\d-]+\.)+[\w]{2,}(\/.*)?$/.test(input)) {
+        url = input.startsWith('http') ? input : 'https://' + input;
+      } else {
+        url = 'https://www.google.com/search?q=' + encodeURIComponent(input);
+      }
+      addRecentVisit(url);
+      window.open(url, '_blank');
+    }
+
+    function quickLaunch(url) {
+      addRecentVisit(url);
+      window.open(url, '_blank');
+    }
+
+    inputField.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') redirect();
+    });
+
+    inputField.addEventListener('input', async () => {
+      const query = inputField.value.trim();
+      if (!query) {
+        suggestionsList.innerHTML = '';
+        return;
+      }
+      const apiURL = `https://en.wikipedia.org/w/api.php?origin=*&action=opensearch&search=${encodeURIComponent(query)}&limit=5&namespace=0&format=json`;
+      try {
+        const response = await fetch(apiURL);
+        const data = await response.json();
+        const suggestions = data[1];
+        const links = data[3];
+        suggestionsList.innerHTML = '';
+        suggestions.forEach((title, index) => {
+          const li = document.createElement('li');
+          li.textContent = title;
+          li.addEventListener('click', () => {
+            inputField.value = title;
+            suggestionsList.innerHTML = '';
+            window.open(links[index], '_blank');
+            addRecentVisit(links[index]);
+          });
+          suggestionsList.appendChild(li);
+        });
+      } catch (e) {
+        console.error('Failed to get Wikipedia suggestions', e);
+      }
+    });
+
+    // Hide suggestions when mouse leaves search area
+    document.getElementById('search-area').addEventListener('mouseleave', () => {
+      suggestionsList.innerHTML = '';
+    });
+
+    function createBookmarkButton(name, url, index = null) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'bookmark-wrapper';
+      const btn = document.createElement('button');
+      btn.textContent = name;
+      btn.addEventListener('click', () => quickLaunch(url));
+      const del = document.createElement('button');
+      del.textContent = '🗑️';
+      del.className = 'bookmark-delete';
+      del.title = 'Delete Bookmark';
+      del.addEventListener('click', () => deleteBookmark(index));
+      wrapper.appendChild(btn);
+      wrapper.appendChild(del);
+      quickLinksContainer.appendChild(wrapper);
+    }
+
+    function loadBookmarks() {
+      const bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      quickLinksContainer.innerHTML = '';
+      bookmarks.forEach((bm, i) => createBookmarkButton(bm.name, bm.url, i));
+    }
+
+    function addBookmark() {
+      const nameInput = document.getElementById('bookmark-name');
+      const urlInput = document.getElementById('bookmark-url');
+      const name = nameInput.value.trim();
+      let url = urlInput.value.trim();
+      if (!name || !url) return;
+      if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+      let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      bookmarks.push({ name, url });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+      createBookmarkButton(name, url, bookmarks.length - 1);
+      nameInput.value = '';
+      urlInput.value = '';
+    }
+
+    function deleteBookmark(index) {
+      let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      bookmarks.splice(index, 1);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+      loadBookmarks();
+    }
+
+    function toggleBookmarkForm() {
+      const form = document.getElementById('bookmark-form');
+      form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function addRecentVisit(url) {
+      let recent = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+      recent = recent.filter(item => item !== url);
+      recent.unshift(url);
+      if (recent.length > MAX_RECENT) recent = recent.slice(0, MAX_RECENT);
+      localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+      renderRecentVisits();
+    }
+
+    function renderRecentVisits() {
+      let recent = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
+      recentLinksContainer.innerHTML = '';
+      if (recent.length === 0) {
+        recentLinksContainer.textContent = 'No recent visits yet.';
+        return;
+      }
+      recent.forEach(url => {
+        const btn = document.createElement('button');
+        let label = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        btn.textContent = label.length > 30 ? label.slice(0, 27) + '...' : label;
+        btn.title = url;
+        btn.addEventListener('click', () => quickLaunch(url));
+        recentLinksContainer.appendChild(btn);
+      });
+    }
+
+    function updateClock() {
+      const clock = document.getElementById('clock');
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const seconds = now.getSeconds().toString().padStart(2, '0');
+      clock.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadBookmarks();
+      renderRecentVisits();
+      updateClock();
+      setInterval(updateClock, 1000);
+    });
+  </script>
+</body>
+</html>
