@@ -7,6 +7,27 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Varela+Round:wght@400&display=swap');
     * { box-sizing: border-box; }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     body {
       margin: 0;
       background-color: black;
@@ -34,6 +55,21 @@
       color: #00ffff;
       font-weight: bold;
     }
+    #day-of-week {
+      font-size: 40px;
+      margin-bottom: 20px;
+      color: #00ffff;
+      font-weight: bold;
+    }
+    #fetched-text {
+      font-size: 24px;
+      margin-top: 20px;
+      max-width: 800px;
+      padding: 10px;
+      background-color: #111;
+      border: 1px solid #00ffff;
+      border-radius: 10px;
+    }
     input#url {
       font-size: 30px;
       width: 600px;
@@ -44,31 +80,26 @@
       border-radius: 15px;
       margin-bottom: 10px;
       padding: 10px;
-      animation: popIn 1.2s ease;
-      transition: width 0.3s ease-in-out, outline-color 0.3s ease-in-out;
     }
     input#url:hover,
     input#url:focus {
       width: 700px;
       outline-color: #00ffff;
     }
-    #search-area {
-      position: relative;
-    }
     #suggestions {
       list-style: none;
       padding: 0;
-      margin-top: 0;
-      width: 600px;
-      text-align: left;
-      color: #ADD8E6;
+      margin: 0;
       background-color: #111;
-      border: 1px solid #ADD8E6;
+      border: 1px solid #00ffff;
       border-radius: 8px;
       max-height: 200px;
       overflow-y: auto;
       position: absolute;
+      width: 600px;
       z-index: 99;
+      color: #ADD8E6;
+      text-align: left;
     }
     #suggestions li {
       padding: 8px 12px;
@@ -88,11 +119,6 @@
       border-radius: 15px;
       cursor: pointer;
       margin-bottom: 20px;
-      transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
-    }
-    button.redirect-button:hover {
-      transform: scale(1.05);
-      filter: brightness(1.2);
     }
     .quick-links {
       margin: 20px 0;
@@ -106,7 +132,6 @@
       color: #ADD8E6;
       border: 2px solid #ADD8E6;
       cursor: pointer;
-      transition: background-color 0.3s ease-in-out;
     }
     .quick-links button:hover {
       background-color: #444;
@@ -128,33 +153,6 @@
     .bookmark-delete:hover {
       color: #ff6666;
     }
-    #recent-visits {
-      margin-top: 30px;
-    }
-    #recent-visits h2 {
-      font-size: 30px;
-      margin-bottom: 10px;
-    }
-    #recent-visits button {
-      margin: 4px;
-      padding: 8px 15px;
-      font-size: 18px;
-      border-radius: 8px;
-      background-color: #111;
-      color: #ADD8E6;
-      border: 2px solid #00ffff;
-      cursor: pointer;
-    }
-    #recent-visits button:hover {
-      background-color: #00ffff;
-      color: black;
-    }
-    .new-image {
-      margin: 20px 0;
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-    }
     .add-bookmark {
       display: none;
       flex-wrap: wrap;
@@ -171,10 +169,6 @@
       outline: 3px solid #ADD8E6;
       border-radius: 10px;
       padding: 8px;
-    }
-    .add-bookmark input:hover,
-    .add-bookmark input:focus {
-      outline-color: #00ffff;
     }
     .add-bookmark button {
       font-size: 20px;
@@ -197,23 +191,18 @@
       border: 3px solid #ADD8E6;
       cursor: pointer;
     }
-    .add-bookmark-toggle:hover {
-      background-color: #444;
+    #recent-visits h2 {
+      font-size: 30px;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes slideDown {
-      from { transform: translateY(-50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @keyframes popIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    #recent-visits button {
+      margin: 4px;
+      padding: 8px 15px;
+      font-size: 18px;
+      border-radius: 8px;
+      background-color: #111;
+      color: #ADD8E6;
+      border: 2px solid #00ffff;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -221,6 +210,8 @@
   <div class="container">
     <div class="text">Chickenpass</div>
     <div id="clock"></div>
+    <div id="day-of-week"></div>
+    <div id="fetched-text">Loading text from GitHub...</div>
 
     <div id="search-area">
       <input type="text" id="url" placeholder="Enter URL or Google Search" />
@@ -228,6 +219,7 @@
     </div>
 
     <button class="redirect-button" onclick="redirect()">Launch</button>
+
     <div class="quick-links" id="quick-links"></div>
     <button class="add-bookmark-toggle" onclick="toggleBookmarkForm()">+</button>
 
@@ -240,15 +232,15 @@
     <div id="recent-visits">
       <h2>Recently Visited Sites</h2>
       <div id="recent-links"></div>
+      <button onclick="clearRecentVisits()" style="margin-top: 10px; background-color: red; border-color: darkred;">Clear History</button>
     </div>
-
-    <img class="new-image" src="https://media.istockphoto.com/id/1180812977/photo/cute-chick-king-or-queen-monarch-costumed-with-golden-crown.jpg?s=612x612&w=0&k=20&c=D3wWeb_5tvZeux9kCiRX3SYpGwFyHj90hd2TcgnMPUA=" alt="Chicken Image" />
   </div>
 
   <script>
     const STORAGE_KEY = 'chickenpass_bookmarks';
     const RECENT_KEY = 'chickenpass_recent';
     const MAX_RECENT = 5;
+
     const inputField = document.getElementById('url');
     const suggestionsList = document.getElementById('suggestions');
     const quickLinksContainer = document.getElementById('quick-links');
@@ -267,88 +259,86 @@
       window.open(url, '_blank');
     }
 
-    function quickLaunch(url) {
-      addRecentVisit(url);
-      window.open(url, '_blank');
-    }
-
     inputField.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') redirect();
     });
 
     inputField.addEventListener('input', async () => {
       const query = inputField.value.trim();
-      if (!query) {
-        suggestionsList.innerHTML = '';
-        return;
-      }
-      const apiURL = `https://en.wikipedia.org/w/api.php?origin=*&action=opensearch&search=${encodeURIComponent(query)}&limit=5&namespace=0&format=json`;
+      if (!query) return suggestionsList.innerHTML = '';
       try {
-        const response = await fetch(apiURL);
-        const data = await response.json();
-        const suggestions = data[1];
-        const links = data[3];
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?origin=*&action=opensearch&search=${encodeURIComponent(query)}&limit=5&format=json`);
+        const data = await res.json();
         suggestionsList.innerHTML = '';
-        suggestions.forEach((title, index) => {
+        data[1].forEach(title => {
           const li = document.createElement('li');
           li.textContent = title;
-          li.addEventListener('click', () => {
+          li.onclick = () => {
             inputField.value = title;
             suggestionsList.innerHTML = '';
-            window.open(links[index], '_blank');
-            addRecentVisit(links[index]);
-          });
+            const googleURL = `https://www.google.com/search?q=${encodeURIComponent(title)}`;
+            addRecentVisit(googleURL);
+            window.open(googleURL, '_blank');
+          };
           suggestionsList.appendChild(li);
         });
-      } catch (e) {
-        console.error('Failed to get Wikipedia suggestions', e);
+      } catch (err) {
+        console.error('Suggestion error:', err);
       }
     });
 
-    // Hide suggestions when mouse leaves search area
-    document.getElementById('search-area').addEventListener('mouseleave', () => {
-      suggestionsList.innerHTML = '';
-    });
+    function quickLaunch(url) {
+      addRecentVisit(url);
+      window.open(url, '_blank');
+    }
 
-    function createBookmarkButton(name, url, index = null) {
+    function createBookmarkButton(name, url, index = null, protectedBookmark = false) {
       const wrapper = document.createElement('div');
       wrapper.className = 'bookmark-wrapper';
       const btn = document.createElement('button');
       btn.textContent = name;
-      btn.addEventListener('click', () => quickLaunch(url));
-      const del = document.createElement('button');
-      del.textContent = '🗑️';
-      del.className = 'bookmark-delete';
-      del.title = 'Delete Bookmark';
-      del.addEventListener('click', () => deleteBookmark(index));
+      btn.onclick = () => quickLaunch(url);
       wrapper.appendChild(btn);
-      wrapper.appendChild(del);
+      if (!protectedBookmark) {
+        const del = document.createElement('button');
+        del.textContent = '🗑️';
+        del.className = 'bookmark-delete';
+        del.title = 'Delete Bookmark';
+        del.onclick = () => deleteBookmark(index);
+        wrapper.appendChild(del);
+      }
       quickLinksContainer.appendChild(wrapper);
     }
 
     function loadBookmarks() {
-      const bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (!bookmarks || bookmarks.length === 0) {
+        bookmarks = [
+          { name: "Poki", url: "https://poki.com", protected: true },
+          { name: "Cool Math Games", url: "https://coolmathgames.com", protected: true }
+        ];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+      }
       quickLinksContainer.innerHTML = '';
-      bookmarks.forEach((bm, i) => createBookmarkButton(bm.name, bm.url, i));
+      bookmarks.forEach((bm, i) => createBookmarkButton(bm.name, bm.url, i, bm.protected));
     }
 
     function addBookmark() {
-      const nameInput = document.getElementById('bookmark-name');
-      const urlInput = document.getElementById('bookmark-url');
-      const name = nameInput.value.trim();
-      let url = urlInput.value.trim();
+      const name = document.getElementById('bookmark-name').value.trim();
+      let url = document.getElementById('bookmark-url').value.trim();
       if (!name || !url) return;
       if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
       let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
       bookmarks.push({ name, url });
       localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
-      createBookmarkButton(name, url, bookmarks.length - 1);
-      nameInput.value = '';
-      urlInput.value = '';
+      loadBookmarks();
+      document.getElementById('bookmark-name').value = '';
+      document.getElementById('bookmark-url').value = '';
     }
 
     function deleteBookmark(index) {
       let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      if (bookmarks[index]?.protected) return;
       bookmarks.splice(index, 1);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
       loadBookmarks();
@@ -377,28 +367,52 @@
       }
       recent.forEach(url => {
         const btn = document.createElement('button');
-        let label = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-        btn.textContent = label.length > 30 ? label.slice(0, 27) + '...' : label;
+        btn.textContent = url.replace(/^https?:\/\//, '').slice(0, 30);
         btn.title = url;
-        btn.addEventListener('click', () => quickLaunch(url));
+        btn.onclick = () => quickLaunch(url);
         recentLinksContainer.appendChild(btn);
       });
     }
 
+    function clearRecentVisits() {
+      localStorage.removeItem(RECENT_KEY);
+      renderRecentVisits();
+    }
+
     function updateClock() {
-      const clock = document.getElementById('clock');
       const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const seconds = now.getSeconds().toString().padStart(2, '0');
-      clock.textContent = `${hours}:${minutes}:${seconds}`;
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+    }
+
+    function updateDayOfWeek() {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const now = new Date();
+      const dayName = days[now.getDay()];
+      document.getElementById('day-of-week').textContent = ` ${dayName}`;
+    }
+
+    async function fetchAndDisplayText() {
+      try {
+        const res = await fetch('https://raw.githubusercontent.com/code-andrewy/cooltext/refs/heads/main/text');
+        const text = await res.text();
+        const lines = text.split(/\r?\n/).filter(Boolean);
+        document.getElementById('fetched-text').textContent = lines[Math.floor(Math.random() * lines.length)];
+      } catch {
+        document.getElementById('fetched-text').textContent = 'Failed to load content.';
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
       loadBookmarks();
       renderRecentVisits();
       updateClock();
+      updateDayOfWeek();
       setInterval(updateClock, 1000);
+      fetchAndDisplayText();
+      setInterval(fetchAndDisplayText, 60000); // refresh text every 60 sec
     });
   </script>
 </body>
