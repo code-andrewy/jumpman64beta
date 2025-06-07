@@ -9,23 +9,13 @@
     * { box-sizing: border-box; }
 
     @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     body {
@@ -34,6 +24,7 @@
       font-family: 'Varela Round', sans-serif;
       color: #ADD8E6;
     }
+
     .container {
       display: flex;
       flex-direction: column;
@@ -43,24 +34,24 @@
       text-align: center;
       animation: fadeIn 1.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     .text {
       font-size: 100px;
       font-weight: bold;
       margin-bottom: 20px;
       animation: slideDown 1s ease;
     }
-    #clock {
+
+    #clock, #day-of-week {
       font-size: 50px;
-      margin-bottom: 20px;
       color: #00ffff;
       font-weight: bold;
     }
+
     #day-of-week {
       font-size: 40px;
-      margin-bottom: 20px;
-      color: #00ffff;
-      font-weight: bold;
     }
+
     #fetched-text {
       font-size: 24px;
       margin-top: 20px;
@@ -70,6 +61,7 @@
       border: 1px solid #00ffff;
       border-radius: 10px;
     }
+
     input#url {
       font-size: 30px;
       width: 600px;
@@ -81,11 +73,13 @@
       margin-bottom: 10px;
       padding: 10px;
     }
+
     input#url:hover,
     input#url:focus {
       width: 700px;
       outline-color: #00ffff;
     }
+
     #suggestions {
       list-style: none;
       padding: 0;
@@ -101,13 +95,16 @@
       color: #ADD8E6;
       text-align: left;
     }
+
     #suggestions li {
       padding: 8px 12px;
       cursor: pointer;
     }
+
     #suggestions li:hover {
       background-color: #222;
     }
+
     button.redirect-button {
       font-size: 30px;
       background-color: green;
@@ -120,9 +117,11 @@
       cursor: pointer;
       margin-bottom: 20px;
     }
+
     .quick-links {
       margin: 20px 0;
     }
+
     .quick-links button {
       margin: 5px;
       padding: 10px 20px;
@@ -133,15 +132,18 @@
       border: 2px solid #ADD8E6;
       cursor: pointer;
     }
+
     .quick-links button:hover {
       background-color: #444;
     }
+
     .bookmark-wrapper {
       display: inline-flex;
       align-items: center;
       gap: 5px;
       margin: 5px;
     }
+
     .bookmark-delete {
       font-size: 16px;
       color: red;
@@ -150,9 +152,11 @@
       cursor: pointer;
       font-weight: bold;
     }
+
     .bookmark-delete:hover {
       color: #ff6666;
     }
+
     .add-bookmark {
       display: none;
       flex-wrap: wrap;
@@ -160,6 +164,7 @@
       gap: 10px;
       margin-top: 20px;
     }
+
     .add-bookmark input {
       font-size: 20px;
       width: 250px;
@@ -170,6 +175,7 @@
       border-radius: 10px;
       padding: 8px;
     }
+
     .add-bookmark button {
       font-size: 20px;
       background-color: #006400;
@@ -181,6 +187,7 @@
       border-radius: 10px;
       cursor: pointer;
     }
+
     .add-bookmark-toggle {
       font-size: 40px;
       width: 60px;
@@ -191,9 +198,11 @@
       border: 3px solid #ADD8E6;
       cursor: pointer;
     }
+
     #recent-visits h2 {
       font-size: 30px;
     }
+
     #recent-visits button {
       margin: 4px;
       padding: 8px 15px;
@@ -203,6 +212,21 @@
       color: #ADD8E6;
       border: 2px solid #00ffff;
       cursor: pointer;
+    }
+
+    /* Loading overlay */
+    #loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      color: #00ffff;
+      font-size: 40px;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
     }
   </style>
 </head>
@@ -236,6 +260,9 @@
     </div>
   </div>
 
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">Loading...</div>
+
   <script>
     const STORAGE_KEY = 'chickenpass_bookmarks';
     const RECENT_KEY = 'chickenpass_recent';
@@ -246,9 +273,18 @@
     const quickLinksContainer = document.getElementById('quick-links');
     const recentLinksContainer = document.getElementById('recent-links');
 
+    function showLoading() {
+      document.getElementById('loading-overlay').style.display = 'flex';
+    }
+
+    function hideLoading() {
+      document.getElementById('loading-overlay').style.display = 'none';
+    }
+
     function redirect() {
       const input = inputField.value.trim();
       if (!input) return;
+      showLoading();
       let url;
       if (/^(https?:\/\/)?([\w\d-]+\.)+[\w]{2,}(\/.*)?$/.test(input)) {
         url = input.startsWith('http') ? input : 'https://' + input;
@@ -256,7 +292,10 @@
         url = 'https://www.google.com/search?q=' + encodeURIComponent(input);
       }
       addRecentVisit(url);
-      window.open(url, '_blank');
+      setTimeout(() => {
+        window.open(url, '_blank');
+        hideLoading();
+      }, 700);
     }
 
     inputField.addEventListener('keydown', function (e) {
@@ -278,7 +317,11 @@
             suggestionsList.innerHTML = '';
             const googleURL = `https://www.google.com/search?q=${encodeURIComponent(title)}`;
             addRecentVisit(googleURL);
-            window.open(googleURL, '_blank');
+            showLoading();
+            setTimeout(() => {
+              window.open(googleURL, '_blank');
+              hideLoading();
+            }, 700);
           };
           suggestionsList.appendChild(li);
         });
@@ -288,8 +331,12 @@
     });
 
     function quickLaunch(url) {
+      showLoading();
       addRecentVisit(url);
-      window.open(url, '_blank');
+      setTimeout(() => {
+        window.open(url, '_blank');
+        hideLoading();
+      }, 700);
     }
 
     function createBookmarkButton(name, url, index = null, protectedBookmark = false) {
@@ -412,7 +459,7 @@
       updateDayOfWeek();
       setInterval(updateClock, 1000);
       fetchAndDisplayText();
-      setInterval(fetchAndDisplayText, 60000); // refresh text every 60 sec
+      setInterval(fetchAndDisplayText, 60000);
     });
   </script>
 </body>
