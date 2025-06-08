@@ -482,15 +482,14 @@
     }
 
     async function fetchAndDisplayText() {
-      try {
-        const res = await fetch('https://raw.githubusercontent.com/code-andrewy/cooltext/refs/heads/main/text');
-        const text = await res.text();
-        const lines = text.split(/\r?\n/).filter(Boolean);
-        document.getElementById('fetched-text').textContent = lines[Math.floor(Math.random()*lines.length)];
-      } catch {
-        document.getElementById('fetched-text').textContent = 'Failed to load content.';
-      }
-    }
+  try {
+    const res = await fetch('https://uselessfacts.jsph.pl/random.json?language=en');
+    const data = await res.json();
+    document.getElementById('fetched-text').textContent = data.text;
+  } catch {
+    document.getElementById('fetched-text').textContent = 'Failed to load content.';
+  }
+}
 
     window.addEventListener('DOMContentLoaded', ()=>{
       loadBookmarks();
