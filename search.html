@@ -5,243 +5,244 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Chickenpass</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Varela+Round:wght@400&display=swap');
-    * { box-sizing: border-box; }
+   @import url('https://fonts.googleapis.com/css2?family=Varela+Round:wght@400&display=swap');
+* { box-sizing: border-box; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    body {
-      margin: 0;
-      background-color: black;
-      font-family: 'Varela Round', sans-serif;
-      color: #ADD8E6;
-    }
+body {
+  margin: 0;
+  background-color: black;
+  font-family: 'Varela Round', sans-serif;
+  color: #FFFFFF;
+}
 
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      animation: fadeIn 1.5s ease-out;
-    }
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  animation: fadeIn 1.5s ease-out;
+}
 
-    .text {
-      font-size: 100px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      animation: slideDown 1s ease-out;
-    }
+.text {
+  font-size: 100px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  animation: slideDown 1s ease-out;
+}
 
-    #clock, #day-of-week {
-      font-size: 50px;
-      color: #00ffff;
-      font-weight: bold;
-    }
+#clock, #day-of-week {
+  font-size: 50px;
+  color: #FFFFFF;
+  font-weight: bold;
+}
 
-    #day-of-week {
-      font-size: 40px;
-    }
+#day-of-week {
+  font-size: 40px;
+}
 
-    #fetched-text {
-      font-size: 24px;
-      margin-top: 20px;
-      max-width: 800px;
-      padding: 10px;
-      background-color: #111;
-      border: 1px solid #00ffff;
-      border-radius: 10px;
-      animation: fadeIn 2s ease;
-    }
+#fetched-text {
+  font-size: 24px;
+  margin-top: 20px;
+  max-width: 800px;
+  padding: 10px;
+  background-color: #111;
+  border: 1px solid #ffffff;
+  border-radius: 10px;
+  animation: fadeIn 2s ease;
+}
 
-    input, button, select {
-      transition: all 0.3s ease;
-    }
+input, button, select {
+  transition: all 0.3s ease;
+}
 
-    input#url {
-      font-size: 30px;
-      width: 600px;
-      height: 60px;
-      background-color: black;
-      color: #ADD8E6;
-      outline: 4px solid #ADD8E6;
-      border-radius: 15px;
-      margin-bottom: 10px;
-      padding: 10px;
-    }
-    input#url:hover, input#url:focus {
-      width: 700px;
-      outline-color: #00ffff;
-    }
+input#url {
+  font-size: 30px;
+  width: 600px;
+  height: 60px;
+  background-color: black;
+  color: #FFFFFF;
+  outline: 4px solid #FFFFFF;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+input#url:hover, input#url:focus {
+  width: 700px;
+  outline-color: #FFFFFF;
+}
 
-    select#search-engine {
-      font-size: 20px;
-      padding: 8px;
-      margin: 10px;
-      background-color: #111;
-      color: #ADD8E6;
-      border: 2px solid #ADD8E6;
-      border-radius: 8px;
-    }
+select#search-engine {
+  font-size: 20px;
+  padding: 8px;
+  margin: 10px;
+  background-color: #111;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  border-radius: 8px;
+}
 
-    #suggestions {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      background-color: #111;
-      border: 1px solid #00ffff;
-      border-radius: 8px;
-      max-height: 200px;
-      overflow-y: auto;
-      position: absolute;
-      width: 600px;
-      z-index: 99;
-      color: #ADD8E6;
-      text-align: left;
-    }
-    #suggestions li {
-      padding: 8px 12px;
-      cursor: pointer;
-    }
-    #suggestions li:hover {
-      background-color: #222;
-    }
+#suggestions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #111;
+  border: 1px solid #FFFFFF;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  width: 600px;
+  z-index: 99;
+  color: #FFFFFF;
+  text-align: left;
+}
+#suggestions li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+#suggestions li:hover {
+  background-color: #222;
+}
 
-    button.redirect-button {
-      font-size: 30px;
-      background-color: green;
-      color: white;
-      border: none;
-      width: 200px;
-      height: 60px;
-      outline: 4px solid darkgreen;
-      border-radius: 15px;
-      cursor: pointer;
-      margin-bottom: 20px;
-      transform: scale(1);
-    }
-    button.redirect-button:hover {
-      background-color: #008000;
-      transform: scale(1.05);
-    }
-    button.redirect-button:active {
-      transform: scale(0.95);
-    }
+button.redirect-button {
+  font-size: 30px;
+  background-color: green;
+  color: white;
+  border: none;
+  width: 200px;
+  height: 60px;
+  outline: 4px solid darkgreen;
+  border-radius: 15px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transform: scale(1);
+}
+button.redirect-button:hover {
+  background-color: #008000;
+  transform: scale(1.05);
+}
+button.redirect-button:active {
+  transform: scale(0.95);
+}
 
-    .quick-links {
-      margin: 20px 0;
-    }
-    .quick-links .bookmark-wrapper {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin: 5px;
-    }
-    .quick-links button {
-      margin: 5px;
-      padding: 10px 20px;
-      font-size: 20px;
-      border-radius: 10px;
-      background-color: #222;
-      color: #ADD8E6;
-      border: 2px solid #ADD8E6;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-    }
-    .quick-links button:hover {
-      background-color: #444;
-      transform: scale(1.05);
-    }
-    .bookmark-delete {
-      font-size: 16px;
-      color: red;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      transition: transform 0.2s ease;
-    }
-    .bookmark-delete:hover {
-      color: #ff6666;
-      transform: scale(1.2);
-    }
+.quick-links {
+  margin: 20px 0;
+}
+.quick-links .bookmark-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 5px;
+}
+.quick-links button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 20px;
+  border-radius: 10px;
+  background-color: #222;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.quick-links button:hover {
+  background-color: #444;
+  transform: scale(1.05);
+}
+.bookmark-delete {
+  font-size: 16px;
+  color: red;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+.bookmark-delete:hover {
+  color: #ff6666;
+  transform: scale(1.2);
+}
 
-    .add-bookmark-toggle {
-      font-size: 40px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background-color: #222;
-      color: #ADD8E6;
-      border: 3px solid #ADD8E6;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-    .add-bookmark-toggle:hover {
-      background-color: #333;
-      transform: rotate(90deg);
-    }
+.add-bookmark-toggle {
+  font-size: 40px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #222;
+  color: #FFFFFF;
+  border: 3px solid #FFFFFF;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.add-bookmark-toggle:hover {
+  background-color: #333;
+  transform: rotate(90deg);
+}
 
-    .add-bookmark {
-      display: none;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .add-bookmark input, .add-bookmark button {
-      font-size: 20px;
-      height: 50px;
-      background-color: black;
-      color: #ADD8E6;
-      border-radius: 10px;
-      padding: 8px;
-      outline: 3px solid #ADD8E6;
-      transition: transform 0.2s ease, background-color 0.2s ease;
-    }
-    .add-bookmark input {
-      width: 250px;
-    }
-    .add-bookmark button {
-      width: 150px;
-      background-color: #006400;
-      outline-color: #004d00;
-    }
-    .add-bookmark button:hover {
-      background-color: #008000;
-      transform: scale(1.05);
-    }
+.add-bookmark {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.add-bookmark input, .add-bookmark button {
+  font-size: 20px;
+  height: 50px;
+  background-color: black;
+  color: #FFFFFF;
+  border-radius: 10px;
+  padding: 8px;
+  outline: 3px solid #FFFFFF;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.add-bookmark input {
+  width: 250px;
+}
+.add-bookmark button {
+  width: 150px;
+  background-color: #006400;
+  outline-color: #004d00;
+}
+.add-bookmark button:hover {
+  background-color: #008000;
+  transform: scale(1.05);
+}
 
-    #recent-visits h2 {
-      font-size: 30px;
-    }
-    #recent-visits button {
-      margin: 4px;
-      padding: 8px 15px;
-      font-size: 18px;
-      border-radius: 8px;
-      background-color: #111;
-      color: #ADD8E6;
-      border: 2px solid #00ffff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-    #recent-visits button:hover {
-      background-color: #222;
-      transform: scale(1.05);
-    }
+#recent-visits h2 {
+  font-size: 30px;
+}
+#recent-visits button {
+  margin: 4px;
+  padding: 8px 15px;
+  font-size: 18px;
+  border-radius: 8px;
+  background-color: #111;
+  color: #ffffff;
+  border: 2px solid #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+#recent-visits button:hover {
+  background-color: #222;
+  transform: scale(1.05);
+}
+
 .slogan {
   font-size: 30px;
   color: #FFFFFF;
@@ -250,19 +251,19 @@
   animation: slideDown 1.2s ease-out;
 }
 
-    #loading-overlay {
-      display: none;
-      position: fixed;
-      top:0; left:0;
-      width:100%; height:100%;
-      background-color: black;
-      color: #00ffff;
-      font-size: 40px;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      animation: fadeIn 0.5s ease-in-out;
-    }
+#loading-overlay {
+  display: none;
+  position: fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background-color: black;
+  color: #ffffff;
+  font-size: 40px;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.5s ease-in-out;
+}
   </style>
 </head>
 <body>
