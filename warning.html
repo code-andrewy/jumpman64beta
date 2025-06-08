@@ -8,99 +8,114 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      background-color: #0f0f0f;
-      color: #f5f5f5;
+      background-color: #121212;
+      color: #f0f0f0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       overflow: hidden;
     }
 
     #warning {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #1c1c1c;
+      background-color: #1f1f1f;
       padding: 2rem;
       border-radius: 16px;
-      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
       text-align: center;
-      max-width: 600px;
       width: 90%;
-      opacity: 0;
-      transform: translate(-50%, -30%);
-      animation: fadeInUp 0.8s ease-out forwards;
+      max-width: 500px;
+      animation: fadeIn 0.6s ease-out forwards;
     }
 
-    @keyframes fadeInUp {
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
       to {
         opacity: 1;
-        transform: translate(-50%, -50%);
+        transform: scale(1);
       }
     }
 
+    h1 {
+      color: #ff5c5c;
+      margin-bottom: 1rem;
+    }
+
+    .emojis {
+      font-size: 1.6rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .warning-text {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
     img {
-      margin-top: 1rem;
       border-radius: 12px;
+      width: 100%;
+      max-width: 180px;
+      margin-top: 1rem;
       transition: transform 0.3s ease;
     }
 
     img:hover {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
 
     button {
       margin-top: 1.5rem;
-      padding: 0.9rem 2rem;
+      padding: 0.9rem 1.8rem;
       font-size: 1.1rem;
       border: none;
       border-radius: 10px;
-      background-color: #3a82f7;
+      background-color: #ff5c5c;
       color: white;
       cursor: pointer;
       transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
     button:hover {
-      background-color: #1e5edc;
+      background-color: #cc3b3b;
       transform: scale(1.05);
     }
 
     #gameFrame {
       display: none;
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
       border: none;
       z-index: 999;
-      animation: fadeIn 1s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
   <div id="warning">
-    <h1>⚠️ Warning: Wacky Nursery</h1>
-    <p>This game contains creepy and unsettling themes that might not be for everyone.</p>
-    <p>Please confirm that you're okay with this before continuing.</p>
+    <h1>⚠️ Content Warning</h1>
+    <div class="emojis">🩸 💥 😨</div>
+    <p class="warning-text">
+      This game contains <strong>cartoon blood</strong>, <strong>violent imagery</strong>, and unsettling themes.
+      It may not be suitable for all players.
+    </p>
     <img src="https://azgames.io/upload/cache/upload/imgs/wackynursery1-m180x180.webp" alt="Wacky Nursery">
     <br>
-    <button onclick="showGame()">Yes, I have read and understand</button>
+    <button onclick="showGame()">Yes, I understand</button>
   </div>
 
-  <iframe id="gameFrame" src="https://azgames.io/wacky-nursery.embed"></iframe>
+  <iframe id="gameFrame" src="https://azgames.io/wacky-nursery.embed" allowfullscreen></iframe>
 
   <script>
     function showGame() {
       document.getElementById('warning').style.display = 'none';
-      const gameFrame = document.getElementById('gameFrame');
-      gameFrame.style.display = 'block';
+      document.getElementById('gameFrame').style.display = 'block';
     }
   </script>
 
