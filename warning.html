@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wacky Nursery - Warning</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: #0f0f0f;
+      color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+    }
+
+    #warning {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #1c1c1c;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+      opacity: 0;
+      transform: translate(-50%, -30%);
+      animation: fadeInUp 0.8s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    img {
+      margin-top: 1rem;
+      border-radius: 12px;
+      transition: transform 0.3s ease;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.9rem 2rem;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #3a82f7;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #1e5edc;
+      transform: scale(1.05);
+    }
+
+    #gameFrame {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      z-index: 999;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="warning">
+    <h1>⚠️ Warning: Wacky Nursery</h1>
+    <p>This game contains creepy and unsettling themes that might not be for everyone.</p>
+    <p>Please confirm that you're okay with this before continuing.</p>
+    <img src="https://azgames.io/upload/cache/upload/imgs/wackynursery1-m180x180.webp" alt="Wacky Nursery">
+    <br>
+    <button onclick="showGame()">Yes, I have read and understand</button>
+  </div>
+
+  <iframe id="gameFrame" src="https://azgames.io/wacky-nursery.embed"></iframe>
+
+  <script>
+    function showGame() {
+      document.getElementById('warning').style.display = 'none';
+      const gameFrame = document.getElementById('gameFrame');
+      gameFrame.style.display = 'block';
+    }
+  </script>
+
+</body>
+</html>
