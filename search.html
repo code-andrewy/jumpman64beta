@@ -32,14 +32,14 @@
       justify-content: center;
       min-height: 100vh;
       text-align: center;
-      animation: fadeIn 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeIn 1.5s ease-out;
     }
 
     .text {
       font-size: 100px;
       font-weight: bold;
       margin-bottom: 20px;
-      animation: slideDown 1s ease;
+      animation: slideDown 1s ease-out;
     }
 
     #clock, #day-of-week {
@@ -60,6 +60,11 @@
       background-color: #111;
       border: 1px solid #00ffff;
       border-radius: 10px;
+      animation: fadeIn 2s ease;
+    }
+
+    input, button, select {
+      transition: all 0.3s ease;
     }
 
     input#url {
@@ -73,11 +78,19 @@
       margin-bottom: 10px;
       padding: 10px;
     }
-
-    input#url:hover,
-    input#url:focus {
+    input#url:hover, input#url:focus {
       width: 700px;
       outline-color: #00ffff;
+    }
+
+    select#search-engine {
+      font-size: 20px;
+      padding: 8px;
+      margin: 10px;
+      background-color: #111;
+      color: #ADD8E6;
+      border: 2px solid #ADD8E6;
+      border-radius: 8px;
     }
 
     #suggestions {
@@ -95,12 +108,10 @@
       color: #ADD8E6;
       text-align: left;
     }
-
     #suggestions li {
       padding: 8px 12px;
       cursor: pointer;
     }
-
     #suggestions li:hover {
       background-color: #222;
     }
@@ -116,12 +127,25 @@
       border-radius: 15px;
       cursor: pointer;
       margin-bottom: 20px;
+      transform: scale(1);
+    }
+    button.redirect-button:hover {
+      background-color: #008000;
+      transform: scale(1.05);
+    }
+    button.redirect-button:active {
+      transform: scale(0.95);
     }
 
     .quick-links {
       margin: 20px 0;
     }
-
+    .quick-links .bookmark-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin: 5px;
+    }
     .quick-links button {
       margin: 5px;
       padding: 10px 20px;
@@ -131,19 +155,13 @@
       color: #ADD8E6;
       border: 2px solid #ADD8E6;
       cursor: pointer;
+      display: flex;
+      align-items: center;
     }
-
     .quick-links button:hover {
       background-color: #444;
+      transform: scale(1.05);
     }
-
-    .bookmark-wrapper {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin: 5px;
-    }
-
     .bookmark-delete {
       font-size: 16px;
       color: red;
@@ -151,41 +169,11 @@
       border: none;
       cursor: pointer;
       font-weight: bold;
+      transition: transform 0.2s ease;
     }
-
     .bookmark-delete:hover {
       color: #ff6666;
-    }
-
-    .add-bookmark {
-      display: none;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .add-bookmark input {
-      font-size: 20px;
-      width: 250px;
-      height: 50px;
-      background-color: black;
-      color: #ADD8E6;
-      outline: 3px solid #ADD8E6;
-      border-radius: 10px;
-      padding: 8px;
-    }
-
-    .add-bookmark button {
-      font-size: 20px;
-      background-color: #006400;
-      color: white;
-      border: none;
-      width: 150px;
-      height: 50px;
-      outline: 3px solid #004d00;
-      border-radius: 10px;
-      cursor: pointer;
+      transform: scale(1.2);
     }
 
     .add-bookmark-toggle {
@@ -197,12 +185,46 @@
       color: #ADD8E6;
       border: 3px solid #ADD8E6;
       cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .add-bookmark-toggle:hover {
+      background-color: #333;
+      transform: rotate(90deg);
+    }
+
+    .add-bookmark {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .add-bookmark input, .add-bookmark button {
+      font-size: 20px;
+      height: 50px;
+      background-color: black;
+      color: #ADD8E6;
+      border-radius: 10px;
+      padding: 8px;
+      outline: 3px solid #ADD8E6;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .add-bookmark input {
+      width: 250px;
+    }
+    .add-bookmark button {
+      width: 150px;
+      background-color: #006400;
+      outline-color: #004d00;
+    }
+    .add-bookmark button:hover {
+      background-color: #008000;
+      transform: scale(1.05);
     }
 
     #recent-visits h2 {
       font-size: 30px;
     }
-
     #recent-visits button {
       margin: 4px;
       padding: 8px 15px;
@@ -212,21 +234,27 @@
       color: #ADD8E6;
       border: 2px solid #00ffff;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    #recent-visits button:hover {
+      background-color: #222;
+      transform: scale(1.05);
     }
 
-    /* Loading overlay */
     #loading-overlay {
       display: none;
       position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
+      top:0; left:0;
+      width:100%; height:100%;
       background-color: black;
       color: #00ffff;
       font-size: 40px;
       align-items: center;
       justify-content: center;
       z-index: 9999;
+      animation: fadeIn 0.5s ease-in-out;
     }
   </style>
 </head>
@@ -237,7 +265,15 @@
     <div id="day-of-week"></div>
     <div id="fetched-text">Loading text from GitHub...</div>
 
-    <div id="search-area">
+    <div style="margin:15px;">
+      <label for="search-engine" style="font-size:20px;">Search with:</label>
+      <select id="search-engine">
+        <option value="google">Google</option>
+        <option value="duckduckgo">DuckDuckGo</option>
+      </select>
+    </div>
+
+    <div id="search-area" style="position:relative;">
       <input type="text" id="url" placeholder="Enter URL or Google Search" />
       <ul id="suggestions"></ul>
     </div>
@@ -250,46 +286,57 @@
     <div class="add-bookmark" id="bookmark-form">
       <input type="text" id="bookmark-name" placeholder="Bookmark Name" />
       <input type="text" id="bookmark-url" placeholder="Bookmark URL (https://...)" />
-      <button onclick="addBookmark()">Add Bookmark</button>
+      <button onclick="addBookmark()">Add</button>
     </div>
 
     <div id="recent-visits">
       <h2>Recently Visited Sites</h2>
       <div id="recent-links"></div>
-      <button onclick="clearRecentVisits()" style="margin-top: 10px; background-color: red; border-color: darkred;">Clear History</button>
+      <div style="display: flex; justify-content: center; margin-top: 10px;">
+  <button onclick="clearRecentVisits()" style="background-color:red; border-color:darkred;">Clear History</button>
+</div>
+
     </div>
   </div>
 
-  <!-- Loading Overlay -->
   <div id="loading-overlay">Loading...</div>
 
   <script>
     const STORAGE_KEY = 'chickenpass_bookmarks';
     const RECENT_KEY = 'chickenpass_recent';
+    const ENGINE_KEY = 'chickenpass_engine';
     const MAX_RECENT = 5;
 
     const inputField = document.getElementById('url');
     const suggestionsList = document.getElementById('suggestions');
-    const quickLinksContainer = document.getElementById('quick-links');
+    const quickLinks = document.getElementById('quick-links');
     const recentLinksContainer = document.getElementById('recent-links');
+    const engineSelect = document.getElementById('search-engine');
 
-    function showLoading() {
-      document.getElementById('loading-overlay').style.display = 'flex';
-    }
+    function showLoading() { document.getElementById('loading-overlay').style.display = 'flex'; }
+    function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
 
-    function hideLoading() {
-      document.getElementById('loading-overlay').style.display = 'none';
+    function getEngine() { return localStorage.getItem(ENGINE_KEY) || 'google'; }
+    function setEngine(val) { localStorage.setItem(ENGINE_KEY, val); }
+
+    engineSelect.value = getEngine();
+    engineSelect.onchange = () => setEngine(engineSelect.value);
+
+    function buildSearchURL(query) {
+      const engine = getEngine();
+      if (engine === 'duckduckgo') return 'https://duckduckgo.com/?q=' + encodeURIComponent(query);
+      return 'https://www.google.com/search?q=' + encodeURIComponent(query);
     }
 
     function redirect() {
       const input = inputField.value.trim();
       if (!input) return;
       showLoading();
-      let url;
-      if (/^(https?:\/\/)?([\w\d-]+\.)+[\w]{2,}(\/.*)?$/.test(input)) {
-        url = input.startsWith('http') ? input : 'https://' + input;
-      } else {
-        url = 'https://www.google.com/search?q=' + encodeURIComponent(input);
+      let url = input;
+      if (!/^(https?:\/\/)/.test(input) && input.includes('.')) {
+        url = (input.startsWith('http') ? '' : 'https://') + input;
+      } else if (!input.includes('.')) {
+        url = buildSearchURL(input);
       }
       addRecentVisit(url);
       setTimeout(() => {
@@ -298,125 +345,126 @@
       }, 700);
     }
 
-    inputField.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') redirect();
-    });
+    inputField.addEventListener('keydown', e => { if (e.key === 'Enter') redirect(); });
 
     inputField.addEventListener('input', async () => {
-      const query = inputField.value.trim();
-      if (!query) return suggestionsList.innerHTML = '';
+      const q = inputField.value.trim();
+      suggestionsList.innerHTML = '';
+      if (!q) return;
       try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?origin=*&action=opensearch&search=${encodeURIComponent(query)}&limit=5&format=json`);
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?origin=*&action=opensearch&search=${encodeURIComponent(q)}&limit=5&format=json`);
         const data = await res.json();
-        suggestionsList.innerHTML = '';
-        data[1].forEach(title => {
+        data[1].forEach(t => {
           const li = document.createElement('li');
-          li.textContent = title;
+          li.textContent = t;
           li.onclick = () => {
-            inputField.value = title;
+            inputField.value = t;
             suggestionsList.innerHTML = '';
-            const googleURL = `https://www.google.com/search?q=${encodeURIComponent(title)}`;
-            addRecentVisit(googleURL);
+            const url = buildSearchURL(t);
+            addRecentVisit(url);
             showLoading();
-            setTimeout(() => {
-              window.open(googleURL, '_blank');
-              hideLoading();
-            }, 700);
+            setTimeout(() => { window.open(url, '_blank'); hideLoading(); }, 700);
           };
           suggestionsList.appendChild(li);
         });
-      } catch (err) {
-        console.error('Suggestion error:', err);
-      }
+      } catch {}
     });
 
     function quickLaunch(url) {
       showLoading();
       addRecentVisit(url);
-      setTimeout(() => {
-        window.open(url, '_blank');
-        hideLoading();
-      }, 700);
+      setTimeout(() => { window.open(url,'_blank'); hideLoading(); },700);
     }
 
-    function createBookmarkButton(name, url, index = null, protectedBookmark = false) {
+    function createBookmarkButton(name, url, index, protectedBookmark=false) {
       const wrapper = document.createElement('div');
       wrapper.className = 'bookmark-wrapper';
       const btn = document.createElement('button');
-      btn.textContent = name;
+      const icon = document.createElement('img');
+      icon.src = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32`;
+      icon.alt = '';
+      icon.style.width = '20px';
+      icon.style.height = '20px';
+      icon.style.marginRight = '8px';
+      btn.appendChild(icon);
+      btn.appendChild(document.createTextNode(name));
       btn.onclick = () => quickLaunch(url);
       wrapper.appendChild(btn);
       if (!protectedBookmark) {
         const del = document.createElement('button');
-        del.textContent = '🗑️';
         del.className = 'bookmark-delete';
+        del.textContent = '🗑️';
         del.title = 'Delete Bookmark';
         del.onclick = () => deleteBookmark(index);
         wrapper.appendChild(del);
       }
-      quickLinksContainer.appendChild(wrapper);
+      quickLinks.appendChild(wrapper);
     }
 
     function loadBookmarks() {
-      let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (!bookmarks || bookmarks.length === 0) {
-        bookmarks = [
-          { name: "Poki", url: "https://poki.com", protected: true },
-          { name: "Cool Math Games", url: "https://coolmathgames.com", protected: true }
-        ];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+      let bms = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (!bms || bms.length===0) {
+        bms = [{name:"Poki",url:"https://poki.com",protected:true},{name:"Cool Math Games",url:"https://coolmathgames.com",protected:true}];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(bms));
       }
-      quickLinksContainer.innerHTML = '';
-      bookmarks.forEach((bm, i) => createBookmarkButton(bm.name, bm.url, i, bm.protected));
+      quickLinks.innerHTML = '';
+      bms.forEach((bm,i)=>createBookmarkButton(bm.name,bm.url,i,bm.protected));
     }
 
     function addBookmark() {
       const name = document.getElementById('bookmark-name').value.trim();
       let url = document.getElementById('bookmark-url').value.trim();
-      if (!name || !url) return;
-      if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-      let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      bookmarks.push({ name, url });
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+      if (!name||!url) return;
+      if (!/^https?:\/\//.test(url)) url='https://'+url;
+      let bms=JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
+      bms.push({name,url});
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(bms));
       loadBookmarks();
-      document.getElementById('bookmark-name').value = '';
-      document.getElementById('bookmark-url').value = '';
+      document.getElementById('bookmark-name').value='';
+      document.getElementById('bookmark-url').value='';
     }
 
-    function deleteBookmark(index) {
-      let bookmarks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      if (bookmarks[index]?.protected) return;
-      bookmarks.splice(index, 1);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks));
+    function deleteBookmark(i) {
+      let bms=JSON.parse(localStorage.getItem(STORAGE_KEY))||[];
+      if (bms[i].protected) return;
+      bms.splice(i,1);
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(bms));
       loadBookmarks();
     }
 
     function toggleBookmarkForm() {
-      const form = document.getElementById('bookmark-form');
-      form.style.display = form.style.display === 'flex' ? 'none' : 'flex';
+      const f = document.getElementById('bookmark-form');
+      f.style.display = f.style.display==='flex'?'none':'flex';
     }
 
     function addRecentVisit(url) {
-      let recent = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
-      recent = recent.filter(item => item !== url);
-      recent.unshift(url);
-      if (recent.length > MAX_RECENT) recent = recent.slice(0, MAX_RECENT);
-      localStorage.setItem(RECENT_KEY, JSON.stringify(recent));
+      let rec = JSON.parse(localStorage.getItem(RECENT_KEY))||[];
+      rec = rec.filter(u=>u!==url);
+      rec.unshift(url);
+      if (rec.length>MAX_RECENT) rec=rec.slice(0,MAX_RECENT);
+      localStorage.setItem(RECENT_KEY,JSON.stringify(rec));
       renderRecentVisits();
     }
 
     function renderRecentVisits() {
-      let recent = JSON.parse(localStorage.getItem(RECENT_KEY)) || [];
-      recentLinksContainer.innerHTML = '';
-      if (recent.length === 0) {
-        recentLinksContainer.textContent = 'No recent visits yet.';
+      let rec = JSON.parse(localStorage.getItem(RECENT_KEY))||[];
+      recentLinksContainer.innerHTML='';
+      if (rec.length===0) {
+        recentLinksContainer.textContent='No recently visited sites yet. 😔 Try searching for something!';
         return;
       }
-      recent.forEach(url => {
+      rec.forEach(u=>{
         const btn = document.createElement('button');
-        btn.textContent = url.replace(/^https?:\/\//, '').slice(0, 30);
-        btn.title = url;
-        btn.onclick = () => quickLaunch(url);
+        const icon = document.createElement('img');
+        icon.src=`https://www.google.com/s2/favicons?domain=${new URL(u).hostname}&sz=32`;
+        icon.alt='';
+        icon.style.width='18px';
+        icon.style.height='18px';
+        icon.style.marginRight='6px';
+        btn.appendChild(icon);
+        btn.title=u;
+        btn.appendChild(document.createTextNode(u.replace(/^https?:\/\//,'').slice(0,30)));
+        btn.onclick = () => quickLaunch(u);
         recentLinksContainer.appendChild(btn);
       });
     }
@@ -427,18 +475,10 @@
     }
 
     function updateClock() {
-      const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
-      const s = String(now.getSeconds()).padStart(2, '0');
-      document.getElementById('clock').textContent = `${h}:${m}:${s}`;
-    }
-
-    function updateDayOfWeek() {
-      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      const now = new Date();
-      const dayName = days[now.getDay()];
-      document.getElementById('day-of-week').textContent = ` ${dayName}`;
+      const n=new Date();
+      document.getElementById('clock').textContent = n.toLocaleTimeString();
+      const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      document.getElementById('day-of-week').textContent = days[n.getDay()];
     }
 
     async function fetchAndDisplayText() {
@@ -446,20 +486,19 @@
         const res = await fetch('https://raw.githubusercontent.com/code-andrewy/cooltext/refs/heads/main/text');
         const text = await res.text();
         const lines = text.split(/\r?\n/).filter(Boolean);
-        document.getElementById('fetched-text').textContent = lines[Math.floor(Math.random() * lines.length)];
+        document.getElementById('fetched-text').textContent = lines[Math.floor(Math.random()*lines.length)];
       } catch {
         document.getElementById('fetched-text').textContent = 'Failed to load content.';
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', ()=>{
       loadBookmarks();
       renderRecentVisits();
       updateClock();
-      updateDayOfWeek();
-      setInterval(updateClock, 1000);
+      setInterval(updateClock,1000);
       fetchAndDisplayText();
-      setInterval(fetchAndDisplayText, 60000);
+      setInterval(fetchAndDisplayText,60000);
     });
   </script>
 </body>
