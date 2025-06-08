@@ -330,12 +330,15 @@
         type();
       }
 
-      fetch("https://raw.githubusercontent.com/code-andrewy/cooltext/refs/heads/main/text")
-        .then((r) => r.text())
-        .then((data) => {
-          const lines = data.split("\n").filter(Boolean);
-          typeText(bannerEl, lines[Math.floor(Math.random() * lines.length)]);
-        });
+      fetch("https://uselessfacts.jsph.pl/api/v2/facts/random?language=en")
+  .then((r) => r.json())
+  .then((data) => {
+    typeText(bannerEl, data.text);
+  })
+  .catch((err) => {
+    console.error("Failed to load useless fact:", err);
+    bannerEl.textContent = "Couldn't load fact 😢";
+  });
 
       let games = [];
 
