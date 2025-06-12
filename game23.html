@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hydrate Fredrick</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: sans-serif;
+      background-color: #ffffff;
+      overflow: hidden;
+    }
+    .game-container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      padding-bottom: 100px; /* room for shop */
+    }
+    #score {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+      #fredrick {
+    width: 300px;
+    max-width: 80vw;
+    z-index: 1;
+    position: relative;
+    }
+    button {
+      margin-top: 30px;
+      background-color: black;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      z-index: 2;
+    }
+    button:hover {
+      opacity: 0.85;
+    }
+    .drink {
+      position: absolute;
+      width: 50px;
+      top: 50%;
+      right: 0; /* start from right edge */
+      transform: translateY(-50%);
+      transition: right 1s ease-out, top 1s ease-out;
+      z-index: 3;
+    }
+    .drink.fly {
+      /* We'll set exact position dynamically in JS */
+    }
+
+    /* Shop styles */
+    #shop {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #eee;
+      border-radius: 8px;
+      padding: 10px 20px;
+      display: flex;
+      gap: 20px;
+      max-width: 90vw;
+      overflow-x: auto;
+      z-index: 5;
+      display: none; /* hidden by default */
+    }
+    .shop-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: white;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      min-width: 120px;
+    }
+    .shop-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      margin-bottom: 5px;
+    }
+    .shop-item button {
+      margin-top: 5px;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background-color: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+    }
+    .shop-item button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    /* Shop toggle button bottom-left */
+    #toggle-shop-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <div id="score">0</div>
+    <img id="fredrick" src="https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/close.svg?v=1749712198142" alt="Fredrick" />
+    <button onclick="giveDrink()">give watr</button>
+    <button id="toggle-shop-btn" onclick="toggleShop()">Open Shop</button>
+
+    <!-- Shop container -->
+    <div id="shop"></div>
+  </div>
+
+  <script>
+    const openMouth = "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/Open.svg?v=1749712189347";
+    const closedMouth = "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/close.svg?v=1749712198142";
+
+    const drinks = [
+      { id: "water", name: "Water", score: 1, cost: 0, src: "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/costume8.svg?v=1749712639587" }, // free default
+      { id: "gatorade", name: "Gatorade", score: 100, cost: 50, src: "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/th%20(15)6.svg?v=1749713012564" },
+    ];
+
+    const fredrick = document.getElementById("fredrick");
+    const scoreDisplay = document.getElementById("score");
+    const container = document.querySelector(".game-container");
+    const shop = document.getElementById("shop");
+    const toggleShopBtn = document.getElementById("toggle-shop-btn");
+
+    let score = parseInt(localStorage.getItem("hydrateScore")) || 0;
+    scoreDisplay.textContent = score;
+
+    let purchasedDrinks = JSON.parse(localStorage.getItem("purchasedDrinks")) || ["water"];
+
+    let currentDrinkId = "water";
+
+    let shopOpen = false;
+
+    function renderShop() {
+      shop.innerHTML = "";
+      drinks.forEach(drink => {
+        if (drink.cost > 0) {
+          const owned = purchasedDrinks.includes(drink.id);
+          const item = document.createElement("div");
+          item.className = "shop-item";
+
+          item.innerHTML = `
+            <img src="${drink.src}" alt="${drink.name}" />
+            <strong>${drink.name}</strong>
+            <div>Cost: ${drink.cost}</div>
+            <button ${owned || score < drink.cost ? "disabled" : ""} 
+              onclick="buyDrink('${drink.id}')">
+              ${owned ? "Owned" : "Buy"}
+            </button>
+            <button ${!owned ? "disabled" : ""} 
+              onclick="selectDrink('${drink.id}')">
+              ${currentDrinkId === drink.id ? "Selected" : "Select"}
+            </button>
+          `;
+          shop.appendChild(item);
+        }
+      });
+
+      // Add "Select Water" button for free drink
+      if (!purchasedDrinks.includes("water")) purchasedDrinks.push("water");
+      if (!document.getElementById("water-select-btn")) {
+        const waterItem = document.createElement("div");
+        waterItem.className = "shop-item";
+        waterItem.innerHTML = `
+          <img src="${drinks[0].src}" alt="Water" />
+          <strong>Water</strong>
+          <div>Free</div>
+          <button disabled>Owned</button>
+          <button onclick="selectDrink('water')" ${currentDrinkId === "water" ? "disabled" : ""}>${currentDrinkId === "water" ? "Selected" : "Select"}</button>
+        `;
+        shop.insertBefore(waterItem, shop.firstChild);
+      }
+    }
+
+    function buyDrink(id) {
+      const drink = drinks.find(d => d.id === id);
+      if (!drink) return;
+      if (score >= drink.cost && !purchasedDrinks.includes(id)) {
+        score -= drink.cost;
+        purchasedDrinks.push(id);
+        localStorage.setItem("hydrateScore", score);
+        localStorage.setItem("purchasedDrinks", JSON.stringify(purchasedDrinks));
+        scoreDisplay.textContent = score;
+        renderShop();
+      }
+    }
+
+    function selectDrink(id) {
+      if (purchasedDrinks.includes(id)) {
+        currentDrinkId = id;
+        renderShop();
+      }
+    }
+
+    let hydratedTimeout;
+
+    function giveDrink() {
+      score++;
+      localStorage.setItem("hydrateScore", score);
+      scoreDisplay.textContent = score;
+      fredrick.src = openMouth;
+
+      const currentDrink = drinks.find(d => d.id === currentDrinkId) || drinks[0];
+
+      // Create drink element
+      const drinkElem = document.createElement("img");
+      drinkElem.src = currentDrink.src;
+      drinkElem.className = "drink";
+
+      // Start from right outside viewport
+      drinkElem.style.right = "-60px";
+      // Vertical position: center aligned to fredrick image
+      const fredRect = fredrick.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+
+      // Position drink vertically aligned with Fredrick center
+      const topPos = fredRect.top + fredRect.height / 2 - containerRect.top;
+      drinkElem.style.top = `${topPos}px`;
+
+      container.appendChild(drinkElem);
+
+      // Animate drink flying left to Fredrick center
+      // Fredrick horizontal center relative to container
+      const rightPos = containerRect.right - (fredRect.left + fredRect.width / 2) - 25; // 25 half drink width
+
+      // Use setTimeout to trigger transition
+      requestAnimationFrame(() => {
+        drinkElem.style.right = `${rightPos}px`;
+        drinkElem.style.top = `${topPos}px`;
+      });
+
+      // Remove drink and reset mouth
+      setTimeout(() => {
+        drinkElem.remove();
+        fredrick.src = closedMouth;
+      }, 1000);
+
+      clearTimeout(hydratedTimeout);
+      hydratedTimeout = setTimeout(() => {
+        fredrick.src = closedMouth;
+      }, 2000);
+
+      renderShop();
+    }
+
+    function toggleShop() {
+      shopOpen = !shopOpen;
+      shop.style.display = shopOpen ? "flex" : "none";
+      toggleShopBtn.textContent = shopOpen ? "Close Shop" : "Open Shop";
+    }
+
+    renderShop();
+  </script>
+
+</body>
+</html>
