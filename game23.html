@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -127,7 +127,7 @@
   <div class="game-container">
     <div id="score">0</div>
     <img id="fredrick" src="https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/close.svg?v=1749712198142" alt="Fredrick" />
-    <button onclick="giveDrink()">give watr</button>
+    <button id="give-button" onclick="giveDrink()">Give Water</button>
     <button id="toggle-shop-btn" onclick="toggleShop()">Open Shop</button>
 
     <!-- Shop container -->
@@ -135,148 +135,306 @@
   </div>
 
   <script>
-    const openMouth = "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/Open.svg?v=1749712189347";
-    const closedMouth = "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/close.svg?v=1749712198142";
+const openMouth = "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/Open.svg?v=1749712189347";
+const closedMouth = "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/close.svg?v=1749712198142";
 
-    const drinks = [
-      { id: "water", name: "Water", score: 1, cost: 0, src: "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/costume8.svg?v=1749712639587" }, // free default
-      { id: "gatorade", name: "Gatorade", score: 100, cost: 50, src: "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/th%20(15)6.svg?v=1749713012564" },
-    ];
+const drinks = [
+  { id: "water", name: "Water", score: 1, cost: 0, src: "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/costume8.svg?v=1749712639587" },
+  { id: "gatorade", name: "Gatorade", score: 50, cost: 50, src: "https://cdn.glitch.global/68d55bd2-6887-4c3e-8fc3-15b94abd6fb5/th%20(15)6.svg?v=1749713012564" },
+  { id: "milk bucket", name: "Milk bucket", score: 100, cost: 100, src: "https://raw.githubusercontent.com/code-andrewy/Games1232/refs/heads/main/image-removebg-preview%20(16).png" },
+  { id: "bleach", name: "Bleach", score: 105, cost: 120, src: "https://i5.walmartimages.com/seo/Clorox-Disinfecting-Bleach-Regular-121-Ounce-Bottle_fb4cd656-4975-4d53-99af-671ebc5a5777_1.7e37c694e18b4d988f6f365af3104c22.jpeg?odnHeight=768&odnWidth=768&odnBg=FFFFFF" },
+  { id: "hot sauce", name: "Hot sauce", score: 115, cost: 150, src: "https://m.media-amazon.com/images/I/51v8GbN1XfS.jpg" },
+  { id: "Popcorn", name: "Popcorn", score: 120, cost: 200, src: "https://static.vecteezy.com/system/resources/thumbnails/042/236/044/small/ai-generated-popcorn-in-striped-box-isolated-on-transparent-background-png.png" },
+];
 
-    const fredrick = document.getElementById("fredrick");
-    const scoreDisplay = document.getElementById("score");
-    const container = document.querySelector(".game-container");
-    const shop = document.getElementById("shop");
-    const toggleShopBtn = document.getElementById("toggle-shop-btn");
+const upgrades = [
+  {
+    id: "cps",
+    name: "CPS Upgrade",
+    baseCost: 100,
+    cost: 100,
+    level: 0,
+    cps: 1,
+    src: "https://static.vecteezy.com/system/resources/thumbnails/055/608/060/small_2x/cursor-icon-pointer-cursor-finger-pointer-clicking-mouse-cursor-png.png"
+  },
+  {
+    id: "autoClicker",
+    name: "Auto Clicker",
+    baseCost: 500,
+    cost: 500,
+    level: 0,
+    cps: 0,
+    src: "https://static.vecteezy.com/system/resources/thumbnails/055/608/060/small_2x/cursor-icon-pointer-cursor-finger-pointer-clicking-mouse-cursor-png.png"
+  }
+];
 
-    let score = parseInt(localStorage.getItem("hydrateScore")) || 0;
+const fredrick = document.getElementById("fredrick");
+const scoreDisplay = document.getElementById("score");
+const container = document.querySelector(".game-container");
+const shop = document.getElementById("shop");
+const toggleShopBtn = document.getElementById("toggle-shop-btn");
+
+const giveButton = document.getElementById("give-button");
+
+// Create popup container for offline earnings
+const offlinePopup = document.createElement("div");
+offlinePopup.id = "offline-popup";
+offlinePopup.style.position = "fixed";
+offlinePopup.style.top = "20px";
+offlinePopup.style.left = "50%";
+offlinePopup.style.transform = "translateX(-50%)";
+offlinePopup.style.backgroundColor = "rgba(0,0,0,0.8)";
+offlinePopup.style.color = "white";
+offlinePopup.style.padding = "15px 30px";
+offlinePopup.style.borderRadius = "10px";
+offlinePopup.style.fontSize = "18px";
+offlinePopup.style.zIndex = "9999";
+offlinePopup.style.display = "none";
+document.body.appendChild(offlinePopup);
+
+let score = parseInt(localStorage.getItem("hydrateScore")) || 0;
+let purchasedDrinks = JSON.parse(localStorage.getItem("purchasedDrinks")) || ["water"];
+let currentDrinkId = localStorage.getItem("currentDrinkId") || "water";
+
+let savedUpgrades = JSON.parse(localStorage.getItem("upgrades"));
+if (savedUpgrades) {
+  upgrades.forEach(upg => {
+    const saved = savedUpgrades.find(s => s.id === upg.id);
+    if (saved) {
+      upg.level = saved.level;
+      upg.cost = saved.cost;
+      upg.cps = saved.cps;
+    }
+  });
+}
+
+scoreDisplay.textContent = score;
+
+let shopOpen = false;
+
+function getTotalCPS() {
+  return upgrades.reduce((total, upg) => {
+    if (upg.id === "cps") return total + upg.cps * upg.level;
+    return total;
+  }, 0);
+}
+
+function renderShop() {
+  shop.innerHTML = "";
+
+  drinks.forEach(drink => {
+    if (drink.cost > 0) {
+      const owned = purchasedDrinks.includes(drink.id);
+      const item = document.createElement("div");
+      item.className = "shop-item";
+
+      item.innerHTML = `
+        <img src="${drink.src}" alt="${drink.name}" />
+        <strong>${drink.name}</strong>
+        <div>Cost: ${drink.cost}</div>
+        <button ${owned || score < drink.cost ? "disabled" : ""} 
+          onclick="buyDrink('${drink.id}')">
+          ${owned ? "Owned" : "Buy"}
+        </button>
+        <button ${!owned ? "disabled" : ""} 
+          onclick="selectDrink('${drink.id}')">
+          ${currentDrinkId === drink.id ? "Selected" : "Select"}
+        </button>
+      `;
+      shop.appendChild(item);
+    }
+  });
+
+  if (!purchasedDrinks.includes("water")) purchasedDrinks.push("water");
+  const waterItem = document.createElement("div");
+  waterItem.className = "shop-item";
+  waterItem.innerHTML = `
+    <img src="${drinks[0].src}" alt="Water" />
+    <strong>Water</strong>
+    <div>Free</div>
+    <button disabled>Owned</button>
+    <button onclick="selectDrink('water')" ${currentDrinkId === "water" ? "disabled" : ""}>${currentDrinkId === "water" ? "Selected" : "Select"}</button>
+  `;
+  shop.insertBefore(waterItem, shop.firstChild);
+
+  upgrades.forEach(upg => {
+    const item = document.createElement("div");
+    item.className = "shop-item";
+
+    item.innerHTML = `
+      <img src="${upg.src}" alt="${upg.name}" />
+      <strong>${upg.name}</strong>
+      <div>Level: ${upg.level}</div>
+      <div>Cost: ${upg.cost}</div>
+      <button ${score < upg.cost ? "disabled" : ""} onclick="buyUpgrade('${upg.id}')">
+        Buy
+      </button>
+    `;
+    shop.appendChild(item);
+  });
+}
+
+function buyDrink(id) {
+  const drink = drinks.find(d => d.id === id);
+  if (!drink) return;
+  if (score >= drink.cost && !purchasedDrinks.includes(id)) {
+    score -= drink.cost;
+    purchasedDrinks.push(id);
+    saveGame();
     scoreDisplay.textContent = score;
-
-    let purchasedDrinks = JSON.parse(localStorage.getItem("purchasedDrinks")) || ["water"];
-
-    let currentDrinkId = "water";
-
-    let shopOpen = false;
-
-    function renderShop() {
-      shop.innerHTML = "";
-      drinks.forEach(drink => {
-        if (drink.cost > 0) {
-          const owned = purchasedDrinks.includes(drink.id);
-          const item = document.createElement("div");
-          item.className = "shop-item";
-
-          item.innerHTML = `
-            <img src="${drink.src}" alt="${drink.name}" />
-            <strong>${drink.name}</strong>
-            <div>Cost: ${drink.cost}</div>
-            <button ${owned || score < drink.cost ? "disabled" : ""} 
-              onclick="buyDrink('${drink.id}')">
-              ${owned ? "Owned" : "Buy"}
-            </button>
-            <button ${!owned ? "disabled" : ""} 
-              onclick="selectDrink('${drink.id}')">
-              ${currentDrinkId === drink.id ? "Selected" : "Select"}
-            </button>
-          `;
-          shop.appendChild(item);
-        }
-      });
-
-      // Add "Select Water" button for free drink
-      if (!purchasedDrinks.includes("water")) purchasedDrinks.push("water");
-      if (!document.getElementById("water-select-btn")) {
-        const waterItem = document.createElement("div");
-        waterItem.className = "shop-item";
-        waterItem.innerHTML = `
-          <img src="${drinks[0].src}" alt="Water" />
-          <strong>Water</strong>
-          <div>Free</div>
-          <button disabled>Owned</button>
-          <button onclick="selectDrink('water')" ${currentDrinkId === "water" ? "disabled" : ""}>${currentDrinkId === "water" ? "Selected" : "Select"}</button>
-        `;
-        shop.insertBefore(waterItem, shop.firstChild);
-      }
-    }
-
-    function buyDrink(id) {
-      const drink = drinks.find(d => d.id === id);
-      if (!drink) return;
-      if (score >= drink.cost && !purchasedDrinks.includes(id)) {
-        score -= drink.cost;
-        purchasedDrinks.push(id);
-        localStorage.setItem("hydrateScore", score);
-        localStorage.setItem("purchasedDrinks", JSON.stringify(purchasedDrinks));
-        scoreDisplay.textContent = score;
-        renderShop();
-      }
-    }
-
-    function selectDrink(id) {
-      if (purchasedDrinks.includes(id)) {
-        currentDrinkId = id;
-        renderShop();
-      }
-    }
-
-    let hydratedTimeout;
-
-    function giveDrink() {
-      score++;
-      localStorage.setItem("hydrateScore", score);
-      scoreDisplay.textContent = score;
-      fredrick.src = openMouth;
-
-      const currentDrink = drinks.find(d => d.id === currentDrinkId) || drinks[0];
-
-      // Create drink element
-      const drinkElem = document.createElement("img");
-      drinkElem.src = currentDrink.src;
-      drinkElem.className = "drink";
-
-      // Start from right outside viewport
-      drinkElem.style.right = "-60px";
-      // Vertical position: center aligned to fredrick image
-      const fredRect = fredrick.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
-
-      // Position drink vertically aligned with Fredrick center
-      const topPos = fredRect.top + fredRect.height / 2 - containerRect.top;
-      drinkElem.style.top = `${topPos}px`;
-
-      container.appendChild(drinkElem);
-
-      // Animate drink flying left to Fredrick center
-      // Fredrick horizontal center relative to container
-      const rightPos = containerRect.right - (fredRect.left + fredRect.width / 2) - 25; // 25 half drink width
-
-      // Use setTimeout to trigger transition
-      requestAnimationFrame(() => {
-        drinkElem.style.right = `${rightPos}px`;
-        drinkElem.style.top = `${topPos}px`;
-      });
-
-      // Remove drink and reset mouth
-      setTimeout(() => {
-        drinkElem.remove();
-        fredrick.src = closedMouth;
-      }, 1000);
-
-      clearTimeout(hydratedTimeout);
-      hydratedTimeout = setTimeout(() => {
-        fredrick.src = closedMouth;
-      }, 2000);
-
-      renderShop();
-    }
-
-    function toggleShop() {
-      shopOpen = !shopOpen;
-      shop.style.display = shopOpen ? "flex" : "none";
-      toggleShopBtn.textContent = shopOpen ? "Close Shop" : "Open Shop";
-    }
-
     renderShop();
+  }
+}
+
+function selectDrink(id) {
+  if (purchasedDrinks.includes(id)) {
+    currentDrinkId = id;
+    localStorage.setItem("currentDrinkId", currentDrinkId);
+    renderShop();
+    updateGiveButtonText();
+  }
+}
+
+function updateGiveButtonText() {
+  const currentDrink = drinks.find(d => d.id === currentDrinkId);
+  giveButton.textContent = `Give ${currentDrink ? currentDrink.name : "Drink"}`;
+}
+
+function buyUpgrade(id) {
+  const upg = upgrades.find(u => u.id === id);
+  if (!upg) return;
+  if (score >= upg.cost) {
+    score -= upg.cost;
+    upg.level++;
+    upg.cost = Math.ceil(upg.baseCost * Math.pow(1.5, upg.level));
+    saveGame();
+    scoreDisplay.textContent = score;
+    renderShop();
+    if (id === "autoClicker") setupAutoClicker();
+  }
+}
+
+function saveGame() {
+  localStorage.setItem("hydrateScore", score);
+  localStorage.setItem("purchasedDrinks", JSON.stringify(purchasedDrinks));
+  localStorage.setItem("currentDrinkId", currentDrinkId);
+  localStorage.setItem("upgrades", JSON.stringify(upgrades));
+  localStorage.setItem("lastActiveTime", Date.now());
+}
+
+let hydratedTimeout;
+
+function giveDrink() {
+  score++;
+  localStorage.setItem("hydrateScore", score);
+  scoreDisplay.textContent = score;
+
+  fredrick.src = openMouth;
+
+  const currentDrink = drinks.find(d => d.id === currentDrinkId) || drinks[0];
+  const drinkElem = document.createElement("img");
+  drinkElem.src = currentDrink.src;
+  drinkElem.className = "drink";
+  drinkElem.style.right = "-60px";
+
+  const fredRect = fredrick.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  const topPos = fredRect.top + fredRect.height / 2 - containerRect.top;
+  drinkElem.style.top = `${topPos}px`;
+
+  container.appendChild(drinkElem);
+
+  const rightPos = containerRect.right - (fredRect.left + fredRect.width / 2) - 25;
+  requestAnimationFrame(() => {
+    drinkElem.style.right = `${rightPos}px`;
+    drinkElem.style.top = `${topPos}px`;
+  });
+
+  setTimeout(() => {
+    if (drinkElem.parentNode) drinkElem.remove();
+  }, 1000);
+
+  setTimeout(() => {
+    if (drinkElem.parentNode) drinkElem.remove();
+  }, 2500);
+
+  clearTimeout(hydratedTimeout);
+  hydratedTimeout = setTimeout(() => {
+    fredrick.src = closedMouth;
+  }, 1500);
+
+  renderShop();
+  saveGame();
+}
+
+function toggleShop() {
+  shopOpen = !shopOpen;
+  shop.style.display = shopOpen ? "flex" : "none";
+  toggleShopBtn.textContent = shopOpen ? "Close Shop" : "Open Shop";
+}
+
+setInterval(() => {
+  const cps = getTotalCPS();
+  if (cps > 0) {
+    score += cps;
+    scoreDisplay.textContent = score;
+    saveGame();
+  }
+}, 1000);
+
+let autoClickerInterval = null;
+
+function setupAutoClicker() {
+  const autoClicker = upgrades.find(u => u.id === "autoClicker");
+  if (autoClickerInterval) clearInterval(autoClickerInterval);
+  if (autoClicker.level > 0) {
+    const interval = Math.max(100, 1000 / autoClicker.level);
+    autoClickerInterval = setInterval(() => {
+      giveDrink();
+    }, interval);
+  }
+}
+
+function calculateOfflineEarnings() {
+  const lastTime = parseInt(localStorage.getItem("lastActiveTime"));
+  if (!lastTime) return 0;
+  const now = Date.now();
+  let elapsedSeconds = Math.floor((now - lastTime) / 1000);
+  if (elapsedSeconds > 43200) elapsedSeconds = 43200;
+
+  const cps = getTotalCPS();
+  return cps * elapsedSeconds;
+}
+
+function showOfflinePopup(amount) {
+  if (amount <= 0) return;
+  offlinePopup.textContent = `While you were offline, you earned ${amount} points!`;
+  offlinePopup.style.display = "block";
+  setTimeout(() => {
+    offlinePopup.style.display = "none";
+  }, 4000);
+}
+
+function handleOfflineEarnings() {
+  const offlineEarnings = calculateOfflineEarnings();
+  if (offlineEarnings > 0) {
+    score += offlineEarnings;
+    scoreDisplay.textContent = score;
+    saveGame();
+    showOfflinePopup(offlineEarnings);
+  }
+}
+
+window.addEventListener("load", () => {
+  handleOfflineEarnings();
+  renderShop();
+  setupAutoClicker();
+  updateGiveButtonText(); // Set button text on load
+});
+
+window.addEventListener("beforeunload", () => {
+  localStorage.setItem("lastActiveTime", Date.now());
+});
   </script>
 
 </body>
