@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wacky Nursery 2 Warning</title>
+  <style>
+    /* Black & White theme with simple words and fade-in */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      text-align: center;
+      user-select: text;
+    }
+    /* Fade in animation */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    h1, p, ul, img, button {
+      opacity: 0;
+      animation-fill-mode: forwards;
+      animation-timing-function: ease-out;
+    }
+    h1 {
+      font-size: 2.4rem;
+      margin-bottom: 1rem;
+      user-select: none;
+      animation-name: fadeInUp;
+      animation-duration: 0.6s;
+      animation-delay: 0.2s;
+    }
+    p {
+      font-size: 1.1rem;
+      line-height: 1.4;
+      margin: 0 20px 1rem 20px;
+      max-width: 700px;
+      animation-name: fadeInUp;
+      animation-duration: 0.6s;
+      animation-delay: 0.4s;
+    }
+    ul {
+      margin: 1rem auto;
+      padding-left: 1.2rem;
+      max-width: 700px;
+      text-align: left;
+      color: #ccc;
+      user-select: text;
+      animation-name: fadeInUp;
+      animation-duration: 0.6s;
+      animation-delay: 0.6s;
+    }
+    ul li {
+      margin-bottom: 0.7rem;
+    }
+    img.game-image {
+      width: 320px;
+      max-width: 80vw;
+      border-radius: 10px;
+      box-shadow: 0 0 12px #fff;
+      margin: 1.5rem 0;
+      user-select: none;
+      pointer-events: none;
+      animation-name: fadeInUp;
+      animation-duration: 0.6s;
+      animation-delay: 0.8s;
+    }
+    button#agree-btn {
+      background-color: #fff;
+      color: #000;
+      border: none;
+      font-weight: 700;
+      font-size: 1.3rem;
+      padding: 0.8rem 2.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.25s ease;
+      user-select: none;
+      margin-bottom: 2rem;
+      align-self: center;
+      animation-name: fadeInUp;
+      animation-duration: 0.6s;
+      animation-delay: 1s;
+      opacity: 0;
+    }
+    button#agree-btn:hover {
+      background-color: #ccc;
+    }
+    /* Fullscreen embed styling */
+    #game-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: none;
+      z-index: 9999;
+      background-color: black;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⚠️ Warning: Wacky Nursery 2 ⚠️</h1>
+  <img 
+    src="https://1games.io/game/wacky-nursery-2/25061104/loading.png" 
+    alt="Wacky Nursery 2 Game Image" 
+    class="game-image" 
+    draggable="false"
+  />
+  <p>This game shows silly baby care scenes that can be loud or messy. You might find some parts surprising.</p>
+  <ul>
+    <li>Messy baby situations</li>
+    <li>Loud sounds</li>
+    <li>Funny and wild pictures</li>
+  </ul>
+  <p>Best for players who like silly and fast games. Take breaks if you need.</p>
+  <button id="agree-btn">I Agree</button>
+
+  <iframe 
+    id="game-container" 
+    src="https://1games.io/embed/wacky-nursery-2" 
+    allowfullscreen 
+    frameborder="0"
+  ></iframe>
+
+  <script>
+    const agreeBtn = document.getElementById('agree-btn');
+    const gameFrame = document.getElementById('game-container');
+
+    function showGame() {
+      [...document.body.children].forEach(el => {
+        if(el.id !== 'game-container') el.style.display = 'none';
+      });
+      gameFrame.style.display = 'block';
+    }
+
+    agreeBtn.addEventListener('click', () => {
+      localStorage.setItem('wackyNursery2Agreed', 'true');
+      showGame();
+    });
+
+    window.onload = () => {
+      if (localStorage.getItem('wackyNursery2Agreed') === 'true') {
+        showGame();
+      } else {
+        // Trigger animation by forcing reflow
+        document.body.offsetHeight;
+        // (Animations run automatically on load by CSS)
+      }
+    };
+  </script>
+  
+</body>
+</html>
